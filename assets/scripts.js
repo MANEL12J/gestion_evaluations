@@ -117,7 +117,7 @@ const evaluationManager = {
             const evaluation = data.evaluation;
 
             this.mettreAJourInterface(evaluation);
-            this.demarrerTimer(evaluation.duree);
+            this.demarrerTimer(evaluation.duree_evaluation);
             this.chargerQuestions(evaluation.questions);
         } catch (error) {
             utils.showError(error, "Erreur lors du chargement de l'évaluation");
@@ -127,8 +127,8 @@ const evaluationManager = {
 
     mettreAJourInterface(evaluation) {
         document.getElementById('evaluation-title').textContent = evaluation.titre;
-        document.getElementById('evaluation-date').textContent = evaluation.date;
-        document.getElementById('evaluation-duration').textContent = utils.formatDuree(evaluation.duree);
+        document.getElementById('evaluation-date').textContent = evaluation.date_evaluation;
+        document.getElementById('evaluation-duration').textContent = utils.formatDuree(evaluation.duree_evaluation);
     },
 
     demarrerTimer(dureeMinutes) {

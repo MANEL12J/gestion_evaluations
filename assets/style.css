@@ -1312,6 +1312,22 @@ section {
     white-space: nowrap;
 }
 
+/* Style pour les champs date, heure et durée */
+.date-time-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+}
+
+.date-time-container .form-group {
+    margin: 0;
+}
+
+.date-time-container input,
+.date-time-container select {
+    width: 100%;
+}
+
 .parcours-selection select {
     padding: 8px 15px;
     border: 1px solid #ddd;
