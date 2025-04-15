@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passer l'évaluation</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="evaluation-page">
+    <div class="timer-container">
+        <div class="timer">
+            <i class="fas fa-clock"></i>
+            <span id="timer-display">00:00:00</span>
+        </div>
+    </div>
+
+    <div class="evaluation-container">
+        <div class="evaluation-header">
+            <h1 id="evaluation-title">Chargement de l'évaluation...</h1>
+            <div class="evaluation-info">
+                <p><i class="fas fa-calendar"></i> Date: <span id="evaluation-date"></span></p>
+                <p><i class="fas fa-clock"></i> Durée: <span id="evaluation-duration"></span></p>
+            </div>
+        </div>
+
+        <form id="evaluation-form">
+            <div id="questions-container">
+                <!-- Les questions seront chargées dynamiquement ici -->
+            </div>
+
+            <div class="evaluation-footer">
+                <button type="submit" class="btn btn-primary submit-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Soumettre l'évaluation
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Template pour une question -->
+    <template id="question-template">
+        <div class="question-block">
+            <h3 class="question-title"></h3>
+            <div class="reponses-container">
+                <!-- Les réponses seront ajoutées ici -->
+            </div>
+        </div>
+    </template>
+
+    <!-- Template pour une réponse -->
+    <template id="reponse-template">
+        <div class="reponse-item">
+            <input type="checkbox" class="reponse-checkbox">
+            <label class="reponse-label"></label>
+        </div>
+    </template>
+
+    <script src="../assets/scripts.js"></script>
+</body>
+</html>

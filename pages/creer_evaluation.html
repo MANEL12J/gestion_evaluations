@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une évaluation</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <div class="header-content">
+                <h1><i class='bx bx-plus-circle'></i> Créer une nouvelle évaluation</h1>
+                <div class="header-actions">
+                    <a href="dashboard_prof.html" class="btn btn-secondary">
+                        <i class='bx bx-arrow-back'></i> Retour au tableau de bord
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <form id="evaluationForm" class="creation-form">
+            <div class="form-section">
+                <h2><i class='bx bx-info-circle'></i> Informations générales</h2>
+                <div class="form-group">
+                    <label for="titre">Titre de l'évaluation</label>
+                    <input type="text" id="titre" placeholder="Ex: Examen de mi-semestre" required>
+                </div>
+
+                <div class="niveau-semestre-module">
+                    <div class="form-group">
+                        <label for="niveau">Niveau</label>
+                        <select id="niveau" required>
+                            <option value="">Sélectionnez un niveau</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                            <option value="L3">L3</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="semestre">Semestre</label>
+                        <select id="semestre" required disabled>
+                            <option value="">Sélectionnez d'abord un niveau</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="module">Module</label>
+                        <select id="module" required disabled>
+                            <option value="">Sélectionnez d'abord un semestre</option>
+                        </select>
+                    </div>
+                </div>
+
+              
+
+
+            </div>
+
+            <div class="form-section">
+                <h2><i class='bx bx-time'></i> Planification</h2>
+                <div class="date-time-container">
+                    <div class="form-group">
+                        <label for="date_evaluation">Date</label>
+                        <input type="date" id="date_evaluation" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="heure_evaluation">Heure</label>
+                        <input type="time" id="heure_evaluation" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="duree_evaluation">Durée</label>
+                        <select id="duree_evaluation" required>
+                            <option value="">Sélectionner la durée</option>
+                            <option value="25">25 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">1 heure</option>
+                    
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2><i class='bx bx-list-check'></i> Questions</h2>
+                <div class="questions-container" id="questionsContainer"></div>
+                <div class="form-actions">
+                    <button type="button" id="btnAjouterQuestion" class="btn btn-secondary">
+                        <i class='bx bx-plus'></i> Ajouter une question
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-actions-main">
+                <button type="button" id="btnCreerEvaluation" class="btn btn-primary btn-large">
+                    <i class='bx bx-check-circle'></i> Créer l'évaluation
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../assets/modules.js"></script>
+    <script src="../assets/scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const niveauSelect = document.getElementById('niveau');
+            const semestreSelect = document.getElementById('semestre');
+            const moduleSelect = document.getElementById('module');
+
+            niveauSelect.addEventListener('change', function() {
+                const niveau = this.value;
+                semestreSelect.innerHTML = '<option value="">Sélectionnez un semestre</option>';
+                moduleSelect.innerHTML = '<option value="">Sélectionnez d\'abord un semestre</option>';
+                
+                if (niveau) {
+                    semestreSelect.disabled = false;
+                    Object.keys(MODULES_PAR_NIVEAU[niveau]).forEach(semestre => {
+                        const option = document.createElement('option');
+                        option.value = semestre;
+                        option.textContent = semestre;
+                        semestreSelect.appendChild(option);
+                    });
+                } else {
+                    semestreSelect.disabled = true;
+                    moduleSelect.disabled = true;
+                }
+            });
+
+            semestreSelect.addEventListener('change', function() {
+                const niveau = niveauSelect.value;
+                const semestre = this.value;
+                moduleSelect.innerHTML = '<option value="">Sélectionnez un module</option>';
+                
+                if (semestre) {
+                    moduleSelect.disabled = false;
+                    MODULES_PAR_NIVEAU[niveau][semestre].forEach(module => {
+                        const option = document.createElement('option');
+                        option.value = module;
+                        option.textContent = module;
+                        moduleSelect.appendChild(option);
+                    });
+                } else {
+                    moduleSelect.disabled = true;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

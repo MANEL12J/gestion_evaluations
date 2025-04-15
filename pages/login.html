@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/login.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>Connexion - Gestion des Évaluations</title>
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class='bx bxs-graduation'></i>
+                <h1>Connexion</h1>
+                <p>Accédez à votre compte</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">
+                        <i class='bx bx-envelope'></i>
+                        Email
+                    </label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class='bx bx-lock-alt'></i>
+                        Mot de passe
+                    </label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="button" onclick="auth.login()" class="login-btn">
+                    <i class='bx bx-log-in'></i>
+                    Se connecter
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Pas encore inscrit ? <a href="register.html">Créer un compte</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="../assets/scripts.js"></script>
+</body>
+</html>

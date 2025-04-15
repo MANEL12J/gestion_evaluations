@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Système de Gestion des Évaluations</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="register-page">
+    <div class="register-container">
+        <div class="register-box">
+            <div class="register-header">
+                <i class="fas fa-user-plus"></i>
+                <h1>Inscription</h1>
+                <p>Créez votre compte pour accéder à la plateforme</p>
+            </div>
+
+            <form id="registerForm" class="register-form">
+                <div class="form-group">
+                    <label for="nom">
+                        <i class="fas fa-user"></i>
+                        Nom
+                    </label>
+                    <input type="text" id="nom" name="nom" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Mot de passe
+                    </label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="type">
+                        <i class="fas fa-user-tag"></i>
+                        Type
+                    </label>
+                    <select id="type" name="type" class="form-control">
+                        <option value="etudiant">Étudiant</option>
+                        <option value="enseignant">Enseignant</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn btn-primary register-btn" onclick="auth.register()">
+                    <i class="fas fa-user-plus"></i>
+                    Créer mon compte
+                </button>
+            </form>
+
+            <div class="register-footer">
+                <p>Déjà inscrit ? <a href="login.html">Se connecter</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/scripts.js" defer></script>
+</body>
+</html>

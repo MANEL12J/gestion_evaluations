@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Étudiant</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête avec bouton de déconnexion -->
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>🎓 Dashboard Étudiant</h1>
+            <button onclick="auth.logout()" class="btn logout-btn">🔓 Déconnexion</button>
+        </div>
+        
+
+        <section class="main-content">
+            <h2 class="section-title">
+                <span class="title-icon">📅</span>
+                Prochaines Évaluations
+            </h2>
+
+            <div class="evaluations-container">
+                <div class="filtres-selection">
+                    <div class="filtre-groupe">
+                        <label for="niveau-etudiant">Niveau :</label>
+                        <select id="niveau-etudiant" onchange="updateFiltres()">
+                            <option value="">Tous les niveaux</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                            <option value="L3">L3</option>
+                        </select>
+                    </div>
+
+                    <div class="filtre-groupe">
+                        <label for="module-etudiant">Module :</label>
+                        <select id="module-etudiant" onchange="voirEvaluationsEtudiant()">
+                            <option value="">Tous les modules</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="evaluations-a-venir" class="evaluations-grid"></div>
+            </div>
+
+            <h2 class="section-title">
+                <span class="title-icon">📖</span>
+                Évaluations Passées
+            </h2>
+            <div id="evaluations-passees" class="evaluations-grid"></div>
+        </section>
+    </div>
+
+    <script src="../assets/modules.js"></script>
+    <script src="../assets/scripts.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            voirEvaluationsEtudiant();
+        });
+    </script>
+</body>
+</html>

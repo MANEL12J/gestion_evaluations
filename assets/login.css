@@ -1,0 +1,117 @@
+/* Page de connexion */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+}
+
+.login-container {
+    width: 95%;
+    max-width: 500px;
+    padding: 25px;
+}
+
+.register .login-container {
+    max-width: 600px;
+}
+
+.login-box {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.login-header i {
+    font-size: 2.8em;
+    color: #3498db;
+    margin-bottom: 2px;
+    display: inline-block;
+}
+
+.login-header h1 {
+    font-size: 1.8em;
+    color: #2c3e50;
+    margin-bottom: 4px;
+    line-height: 1;
+}
+
+.login-header p {
+    color: #7f8c8d;
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+/* Formulaire */
+.login-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #34495e;
+    font-size: 1.2em;
+}
+
+.form-group label i {
+    margin-right: 8px;
+    color: #3498db;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e0e6ed;
+    border-radius: 6px;
+    font-size: 1em;
+    height: 38px;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.3em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.login-btn:hover {
+    background: #2980b9;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.3em;
+}
+
+.login-footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
