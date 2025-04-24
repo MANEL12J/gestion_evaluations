@@ -55,6 +55,20 @@ const utils = {
 
 // Gestion de l'authentification
 const auth = {
+    // Affichage dynamique du champ niveau
+    initRegisterForm() {
+        const typeSelect = document.getElementById('type');
+        const niveauGroup = document.getElementById('niveau-group');
+        if (!typeSelect || !niveauGroup) return;
+        typeSelect.addEventListener('change', function() {
+            if (this.value === 'etudiant') {
+                niveauGroup.style.display = '';
+            } else {
+                niveauGroup.style.display = 'none';
+                document.getElementById('niveau').value = '';
+            }
+        });
+    },
     async login() {
         try {
             const email = utils.getFieldValue("[name='email']");
@@ -80,7 +94,13 @@ const auth = {
                 password: utils.getFieldValue("[name='password']"),
                 type: utils.getFieldValue("[name='type']"),
             };
-
+            // Si étudiant, ajouter le niveau
+            if (userData.type === 'etudiant') {
+                userData.niveau = utils.getFieldValue("[name='niveau']");
+                if (!userData.niveau) {
+                    throw new Error("Veuillez sélectionner le niveau");
+                }
+            }
             const requiredFields = ['nom', 'email', 'password', 'type'];
             if (requiredFields.some(field => !userData[field])) {
                 throw new Error("Veuillez remplir tous les champs obligatoires");
@@ -276,7 +296,64 @@ const evaluationManager = {
 
 
 // Appel automatique au chargement de la page
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
+    // Gestion du bouton "Modifier niveau"
+    const btnModifierNiveau = document.getElementById('btn-modifier-niveau');
+    const modalNiveau = document.getElementById('modal-niveau');
+    const selectNiveau = document.getElementById('niveau-etudiant');
+    const selectNouveauNiveau = document.getElementById('nouveau-niveau');
+    const btnValiderNiveau = document.getElementById('valider-niveau');
+    const btnAnnulerNiveau = document.getElementById('annuler-niveau');
+
+    if (btnModifierNiveau && modalNiveau && selectNiveau && selectNouveauNiveau && btnValiderNiveau && btnAnnulerNiveau) {
+        btnModifierNiveau.addEventListener('click', () => {
+            // Préselectionner le niveau actuel
+            selectNouveauNiveau.value = selectNiveau.value || 'L1';
+            modalNiveau.style.display = 'flex';
+        });
+        btnAnnulerNiveau.addEventListener('click', () => {
+            modalNiveau.style.display = 'none';
+        });
+        btnValiderNiveau.addEventListener('click', async () => {
+            const nouveauNiveau = selectNouveauNiveau.value;
+            if (!['L1','L2','L3'].includes(nouveauNiveau)) return;
+            try {
+                const res = await utils.apiRequest('update_niveau.php', 'POST', { niveau: nouveauNiveau });
+                if (res.success && res.niveau) {
+                    selectNiveau.value = res.niveau;
+                    selectNiveau.dispatchEvent(new Event('change'));
+                    alert('Niveau mis à jour avec succès !');
+                } else {
+                    alert(res.message || 'Erreur lors de la mise à jour du niveau');
+                }
+            } catch (e) {
+                alert('Erreur serveur lors de la mise à jour du niveau');
+            }
+            modalNiveau.style.display = 'none';
+        });
+        // Fermer la modal si on clique en dehors du contenu
+        modalNiveau.addEventListener('click', (e) => {
+            if (e.target === modalNiveau) modalNiveau.style.display = 'none';
+        });
+    }
+
+    // Préremplir le niveau de l'étudiant si présent
+    if (window.location.pathname.includes("dashboard_etudiant.html")) {
+        const niveauSelect = document.getElementById('niveau-etudiant');
+        if (niveauSelect) {
+            try {
+                // Appel API pour récupérer le niveau
+                const res = await utils.apiRequest('get_user_info.php', 'GET');
+                if (res.success && res.niveau) {
+                    niveauSelect.value = res.niveau;
+                    // Déclencher le changement pour mettre à jour les modules
+                    niveauSelect.dispatchEvent(new Event('change'));
+                }
+            } catch (e) {
+                // Optionnel : afficher une erreur ou ignorer
+            }
+        }
+    }
     console.log("✅ Script chargé !");
     document.getElementById("questionsContainer").innerHTML = "<p>Test affichage</p>";
 });

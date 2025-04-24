@@ -53,6 +53,19 @@
                     </select>
                 </div>
 
+                <div class="form-group" id="niveau-group" style="display:none;">
+                    <label for="niveau">
+                        <i class="fas fa-layer-group"></i>
+                        Niveau
+                    </label>
+                    <select id="niveau" name="niveau" class="form-control">
+                        <option value="">Sélectionnez le niveau</option>
+                        <option value="L1">L1</option>
+                        <option value="L2">L2</option>
+                        <option value="L3">L3</option>
+                    </select>
+                </div>
+
                 <button type="button" class="btn btn-primary register-btn" onclick="auth.register()">
                     <i class="fas fa-user-plus"></i>
                     Créer mon compte
@@ -65,6 +78,13 @@
         </div>
     </div>
 
-    <script src="../assets/scripts.js" defer></script>
+    <script src="../assets/scripts.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof auth !== 'undefined' && auth.initRegisterForm) {
+          auth.initRegisterForm();
+        }
+      });
+    </script>
 </body>
 </html>

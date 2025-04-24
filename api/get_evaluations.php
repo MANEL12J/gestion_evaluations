@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'enseignant') {
 $user_id = $_SESSION['user_id'];
 
 // Préparer et exécuter la requête
-$query = "SELECT id, titre, date_evaluation, heure_evaluation, duree_evaluation, niveau, semestre, module, createur_id FROM evaluations WHERE createur_id = :user_id ORDER BY date_evaluation DESC, heure_evaluation DESC";
+$query = "SELECT id, titre, date_evaluation, heure_evaluation, duree_evaluation, niveau, semestre, module, createur_id FROM evaluations WHERE createur_id = :user_id AND archive = 0 ORDER BY date_evaluation DESC, heure_evaluation DESC";
 $stmt = $pdo->prepare($query);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();

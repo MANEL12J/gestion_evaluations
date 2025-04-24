@@ -26,12 +26,30 @@
                 <div class="filtres-selection">
                     <div class="filtre-groupe">
                         <label for="niveau-etudiant">Niveau :</label>
-                        <select id="niveau-etudiant" onchange="updateFiltres()">
-                            <option value="">Tous les niveaux</option>
-                            <option value="L1">L1</option>
-                            <option value="L2">L2</option>
-                            <option value="L3">L3</option>
-                        </select>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+    <select id="niveau-etudiant" onchange="updateFiltres()">
+        <option value="">Tous les niveaux</option>
+        <option value="L1">L1</option>
+        <option value="L2">L2</option>
+        <option value="L3">L3</option>
+    </select>
+    <button id="btn-modifier-niveau" class="btn btn-secondary" type="button" style="font-size:0.9em; padding: 7px 14px;">Modifier niveau</button>
+</div>
+<!-- Modal pour modifier le niveau -->
+<div id="modal-niveau" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); justify-content:center; align-items:center; z-index:9999;">
+    <div style="background:white; padding:30px 25px; border-radius:10px; min-width:260px; box-shadow:0 4px 16px rgba(0,0,0,0.12); text-align:center;">
+        <h3>Modifier mon niveau</h3>
+        <select id="nouveau-niveau" style="margin: 16px 0; padding: 7px 12px; width:100%;">
+            <option value="L1">L1</option>
+            <option value="L2">L2</option>
+            <option value="L3">L3</option>
+        </select>
+        <div style="margin-top: 12px; display:flex; gap:12px; justify-content:center;">
+            <button id="valider-niveau" class="btn btn-primary" type="button">Valider</button>
+            <button id="annuler-niveau" class="btn btn-danger" type="button">Annuler</button>
+        </div>
+    </div>
+</div>
                     </div>
 
                     <div class="filtre-groupe">

@@ -23,11 +23,12 @@ $nom = htmlspecialchars($data['nom']);
 $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
 $password = password_hash($data['password'], PASSWORD_DEFAULT);
 $type = $data['type'];
+$niveau = isset($data['niveau']) && $type === 'etudiant' ? $data['niveau'] : null;
 
 try {
-    $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, password, type) VALUES (?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, password, type, niveau) VALUES (?, ?, ?, ?, ?)");
     
-    if ($stmt->execute([$nom, $email, $password, $type])) {
+    if ($stmt->execute([$nom, $email, $password, $type, $niveau])) {
         echo json_encode(["success" => true, "message" => "Inscription réussie"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Erreur lors de l'insertion"]);

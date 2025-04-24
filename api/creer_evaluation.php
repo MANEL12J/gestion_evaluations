@@ -71,6 +71,23 @@ try {
     }
 
     $pdo->commit(); // Valide la transaction
+
+    // Appel API pour notification immédiate
+    $notificationUrl = $_SERVER['REQUEST_SCHEME']. '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']) . '/send_evaluation_notification.php';
+    $payload = [
+        'niveau' => $niveau,
+        'module' => $module,
+        'date_evaluation' => $date_evaluation,
+        'heure_evaluation' => $heure_evaluation
+    ];
+    $ch = curl_init($notificationUrl);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
     echo json_encode(["success" => true]);
 } catch (Exception $e) {
     $pdo->rollBack(); // Annule la transaction en cas d'erreur

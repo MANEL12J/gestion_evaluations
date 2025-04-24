@@ -22,13 +22,13 @@ if (!isset($data['id'])) {
 $eval_id = $data['id'];
 
 // Vérifier si l'évaluation appartient à l'utilisateur
-$query = "DELETE FROM evaluations WHERE id = ? AND createur_id = ?";
+$query = "UPDATE evaluations SET archive = 1 WHERE id = ? AND createur_id = ?";
 $stmt = $pdo->prepare($query);
 $stmt->execute([$eval_id, $user_id]);
 
 if ($stmt->rowCount() > 0) {
-    echo json_encode(['success' => true, 'message' => 'Évaluation supprimée']);
+    echo json_encode(['success' => true, 'message' => 'Évaluation archivée']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Erreur lors de la suppression']);
+    echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'archivage']);
 }
 ?>
