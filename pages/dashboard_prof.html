@@ -18,6 +18,9 @@
                     <a href="creer_evaluation.html" class="btn btn-success">
                         <i class='bx bx-plus-circle'></i> Nouvelle Évaluation
                     </a>
+                    <a href="consulter_notes.html" class="btn btn-primary">
+                        <i class='bx bx-bar-chart-alt-2'></i> Consulter les Notes
+                    </a>
                     <button onclick="auth.logout()" class="btn logout-btn">
                         <i class='bx bx-log-out'></i> Déconnexion
                     </button>
@@ -34,49 +37,10 @@
             <div id="mesEvaluations" class="evaluations-grid"></div>
         </section>
 
-        <!-- Section Notes Étudiants -->
-        <section class="dashboard-section">
-            <div class="section-header">
-                <h2><i class='bx bx-bar-chart'></i> Notes Étudiants</h2>
-                <div class="section-actions">
-                    <div class="search-box">
-                        <i class='bx bx-search'></i>
-                        <input type="text" id="search-notes" placeholder="Rechercher un étudiant..." 
-                               oninput="filtrerNotes()">
-                    </div>
-                    <select id="filtre-niveau" onchange="afficherNotesEtudiants()" class="select-styled">
-                        <option value="">Tous les niveaux</option>
-                        <option value="L1">Licence 1</option>
-                        <option value="L2">Licence 2</option>
-                        <option value="L3">Licence 3</option>
-                    </select>
-                </div>
-            </div>
-            <div class="tableau-notes">
-                <table>
-                    <thead>
-                        <tr>
-                            <th><i class='bx bx-book'></i> Évaluation</th>
-                            <th><i class='bx bx-calendar'></i> Date</th>
-                            <th><i class='bx bx-bookmark'></i> Niveau & Module</th>
-                            <th><i class='bx bx-user'></i> Étudiant</th>
-                            <th><i class='bx bx-trophy'></i> Note</th>
-                            <th><i class='bx bx-time'></i> Soumission</th>
-                        </tr>
-                    </thead>
-                    <tbody id="notes-etudiants">
-                        <!-- Les notes seront chargées ici dynamiquement -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+       
     </div>
 
     <script src="../assets/scripts.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            afficherNotesEtudiants();
-        });
-    </script>
+   
 </body>
 </html>

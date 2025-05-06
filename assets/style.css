@@ -75,10 +75,9 @@ body {
 
 /* Conteneur principal */
 .container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--space-lg);
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Header de page */
@@ -88,6 +87,30 @@ body {
     box-shadow: var(--shadow-md);
     margin-bottom: var(--space-xl);
     border-radius: var(--radius-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.header-actions .btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.header-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .header-content {
@@ -148,6 +171,33 @@ body {
 /* Actions */
 .form-actions {
     margin-top: var(--space-sm);
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--space-md);
+    margin: var(--space-md) 0;
+    padding: var(--space-md);
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.action-buttons .btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    font-size: 1.1em;
+    font-weight: 500;
+    min-width: 200px;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .form-actions-main {
@@ -593,6 +643,65 @@ footer {
     text-decoration: underline;
 }
 
+/* Styles pour le conteneur du tableau */
+#evaluations-passees {
+    width: 100%;
+    padding: 10px;
+}
+
+/* Styles pour le tableau des évaluations passées */
+.evaluations-table {
+    width: 98%;
+    border-collapse: collapse;
+    background: white;
+    margin: 0 auto;
+    font-size: 14px;
+    table-layout: fixed;
+}
+
+.evaluations-table thead {
+    background-color: #f8f9fa;
+}
+
+.evaluations-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border: 1px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.evaluations-table td {
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    line-height: 1.3;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.evaluations-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Style pour grouper les niveaux */
+.evaluations-table tbody tr[data-niveau] {
+    background-color: #f8f9fa;
+}
+
+.evaluations-table tbody tr[data-niveau] td {
+    font-weight: bold;
+    background-color: #e9ecef;
+    color: #495057;
+    font-size: 15px;
+    padding: 8px;
+}
+
+.evaluations-table .note-cell {
+    font-weight: bold;
+    color: #28a745;
+}
+
 /* Page des Évaluations */
 .evaluations-container {
     margin: var(--space-lg) 0;
@@ -620,11 +729,9 @@ footer {
 }
 
 .evaluations-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-    margin: var(--space-md) 0;
-    padding: var(--space-sm);
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 @media (max-width: 1200px) {
@@ -1021,13 +1128,9 @@ body {
 
 /* Conteneur principal */
 .container {
-    width: 90%;
-    max-width: 800px;
-    margin: 50px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Boutons */
@@ -1068,10 +1171,11 @@ input, select, textarea {
     background: #fff;
     font-size: 1em;
     font-weight: 600;
-}
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+   
+
 
 /* Header */
 header {
@@ -1260,7 +1364,8 @@ section {
 
 /* Styles pour le dashboard étudiant */
 .main-content {
-    padding: 20px;
+    padding: 0;
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
@@ -1597,7 +1702,8 @@ section {
 ==================================*/
 
 .main-content {
-    padding: var(--space-lg);
+    padding: 0;
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     background: var(--bg-gradient);
@@ -1777,10 +1883,4 @@ section {
     .date-time-container {
         flex-direction: column;
     }
-}
 
-    
-    .date-time-container {
-        flex-direction: column;
-    }
-}

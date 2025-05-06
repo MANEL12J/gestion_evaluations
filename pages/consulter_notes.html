@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultation des Notes</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .student-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .note-value {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .evaluation-title {
+            color: #333;
+            margin: 30px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .evaluation-title:first-child {
+            margin-top: 0;
+        }
+        .notes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .notes-table th,
+        .notes-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .notes-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        .notes-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .filtres-selection {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .select-filters-message {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .select-filters-message i {
+            font-size: 2.5em;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        .select-filters-message p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .filtre-groupe {
+            margin-bottom: 10px;
+        }
+        .filtre-groupe:last-child {
+            margin-bottom: 0;
+        }
+        .filtre-groupe label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        .filtre-groupe select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+        @media (min-width: 768px) {
+            .filtres-selection {
+                display: flex;
+                gap: 20px;
+                align-items: flex-end;
+            }
+            .filtre-groupe {
+                flex: 1;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Consultation des Notes</h1>
+            <button onclick="window.location.href='dashboard_prof.html'" class="btn btn-secondary btn-sm" style="padding: 5px 10px; font-size: 0.9em; width: auto; min-width: 80px;">
+                <i class="fas fa-arrow-left"></i> Retour
+            </button>
+        </div>
+
+        <div class="filtres-selection">
+            <div class="filtre-groupe">
+                <label for="niveau-notes">Parcours :</label>
+                <select id="niveau-notes" onchange="updateFiltresNotes()">
+                    <option value="">Tous les parcours</option>
+                    <option value="L1">L1</option>
+                    <option value="L2">L2</option>
+                    <option value="L3">L3</option>
+                </select>
+            </div>
+
+            <div class="filtre-groupe">
+                <label for="semestre-notes">Semestre :</label>
+                <select id="semestre-notes" onchange="updateFiltresNotes()" disabled>
+                    <option value="">Tous les semestres</option>
+                </select>
+            </div>
+
+            <div class="filtre-groupe">
+                <label for="module-notes">Module :</label>
+                <select id="module-notes" onchange="updateFiltresNotes()" disabled>
+                    <option value="">Tous les modules</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="notes-container">
+            <div class="select-filters-message">
+                <i class='bx bx-filter-alt'></i>
+                <p>Veuillez sélectionner au moins un critère de consultation</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/modules.js"></script>
+    <script src="../assets/scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajouter des event listeners pour les changements
+            document.getElementById('niveau-notes').addEventListener('change', function() {
+                const semestreSelect = document.getElementById('semestre-notes');
+                const moduleSelect = document.getElementById('module-notes');
+                
+                // Activer/désactiver les selects selon la sélection
+                semestreSelect.disabled = !this.value;
+                moduleSelect.disabled = true;
+                
+                // Réinitialiser les valeurs
+                semestreSelect.innerHTML = `
+                    <option value="">Tous les semestres</option>
+                    <option value="S1">Semestre 1</option>
+                    <option value="S2">Semestre 2</option>
+                `;
+                moduleSelect.innerHTML = '<option value="">Tous les modules</option>';
+                
+                // Charger les notes
+                chargerNotes();
+            });
+            
+            document.getElementById('semestre-notes').addEventListener('change', function() {
+                const niveau = document.getElementById('niveau-notes').value;
+                const moduleSelect = document.getElementById('module-notes');
+                
+                // Activer/désactiver le select des modules
+                moduleSelect.disabled = !this.value;
+                moduleSelect.innerHTML = '<option value="">Tous les modules</option>';
+                
+                // Charger les modules si un semestre est sélectionné
+                if (this.value && MODULES_PAR_NIVEAU && MODULES_PAR_NIVEAU[niveau]) {
+                    const semestreKey = this.value === 'S1' ? 'Semestre 1' : 'Semestre 2';
+                    const modules = MODULES_PAR_NIVEAU[niveau][semestreKey] || [];
+                    
+                    modules.forEach(module => {
+                        const option = document.createElement('option');
+                        option.value = module;
+                        option.textContent = module;
+                        moduleSelect.appendChild(option);
+                    });
+                }
+                
+                // Charger les notes
+                chargerNotes();
+            });
+            
+            document.getElementById('module-notes').addEventListener('change', chargerNotes);
+            
+            // Charger les notes initiales
+            chargerNotes();
+        });
+    </script>
+</body>
+</html>

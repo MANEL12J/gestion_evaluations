@@ -2,6 +2,131 @@
 const API_URL = "http://localhost/gestion_evaluations/api/";
 
 // Utilitaires
+
+// Fonction pour mettre à jour les filtres de notes
+async function updateFiltresNotes() {
+    // Charger les notes avec les filtres actuels
+    chargerNotes();
+}
+
+// Fonction pour charger et afficher les notes
+async function chargerNotes() {
+    const notesContainer = document.getElementById('notes-container');
+    if (!notesContainer) return;
+
+    // Récupérer les valeurs des filtres
+    const niveau = document.getElementById('niveau-notes').value;
+    const semestre = document.getElementById('semestre-notes').value;
+    const module = document.getElementById('module-notes').value;
+
+    // Si aucun filtre n'est sélectionné, afficher le message initial
+    if (!niveau && !semestre && !module) {
+        notesContainer.innerHTML = `
+            <div class="select-filters-message">
+                <i class='bx bx-filter-alt'></i>
+                <p>Veuillez sélectionner au moins un critère de consultation</p>
+            </div>
+        `;
+        return;
+    }
+
+    try {
+        // Construire l'URL avec les paramètres de filtrage
+        let url = `${API_URL}get_notes_etudiants.php`;
+        const params = [];
+        if (niveau) params.push(`niveau=${niveau}`);
+        if (semestre) {
+            // Convertir S1/S2 en format de la base de données
+            const semestreValue = semestre === 'S1' ? 'Semestre 1' : 'Semestre 2';
+            params.push(`semestre=${semestreValue}`);
+        }
+        if (module) params.push(`module=${encodeURIComponent(module)}`);
+        
+        url += '?' + params.join('&');
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success && data.evaluations) {
+            notesContainer.innerHTML = '';
+            
+            if (data.evaluations.length > 0) {
+                // Pour chaque évaluation
+                data.evaluations.forEach(evalData => {
+                    // Titre de l'évaluation
+                    const evalTitle = document.createElement('h3');
+                    evalTitle.className = 'evaluation-title';
+                    evalTitle.textContent = evalData.evaluation.evaluation_titre;
+                    notesContainer.appendChild(evalTitle);
+                    
+                    const table = document.createElement('table');
+                    table.className = 'notes-table';
+
+                    // En-tête du tableau
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Étudiant</th>
+                                <th>Parcours</th>
+                                <th>Semestre</th>
+                                <th>Module</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    `;
+                    
+                    if (evalData.notes && evalData.notes.length > 0) {
+                        // Ajouter les lignes de notes
+                        evalData.notes.forEach(note => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>
+                                    <div class="student-name">
+                                        <i class='bx bx-user'></i>
+                                        ${note.etudiant_nom}
+                                    </div>
+                                </td>
+                                <td>${evalData.evaluation.niveau}</td>
+                                <td>${evalData.evaluation.semestre}</td>
+                                <td>${evalData.evaluation.module}</td>
+                                <td>
+                                    <div class="note-value ${getNoteCssClass(note.note)}">
+                                        ${note.note}/20
+                                    </div>
+                                </td>
+                            `;
+                            table.querySelector('tbody').appendChild(tr);
+                        });
+                    } else {
+                        // Aucune note pour cette évaluation
+                        table.querySelector('tbody').innerHTML = `
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 20px;">
+                                    Aucune note pour cette évaluation
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    notesContainer.appendChild(table);
+                });
+            } else {
+                notesContainer.innerHTML = `
+                    <div class="no-data" style="text-align: center; padding: 20px;">
+                        Aucune évaluation trouvée pour les critères sélectionnés
+                    </div>
+                `;
+            }
+        } else {
+            notesContainer.innerHTML = '<p>Erreur lors du chargement des notes.</p>';
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        notesContainer.innerHTML = '<p>Erreur lors du chargement des notes.</p>';
+    }
+}
+
 const utils = {
     // Fonction pour les requêtes AJAX
     async apiRequest(endpoint, method = "GET", data = null) {
@@ -256,8 +381,14 @@ const evaluationManager = {
 
             console.log('Réponse du serveur:', data);
 
+            console.log('Soumission réussie, désactivation des protections de navigation');
+            // Marquer l'évaluation comme soumise
+            sessionStorage.setItem('evaluationSoumise', 'true');
+            
+            // Désactiver le blocage de navigation
+            window.onbeforeunload = null;
             alert(`Évaluation soumise avec succès! Note: ${data.note}/20`);
-            utils.redirect('dashboard_etudiant.html');
+            window.location.href = 'dashboard_etudiant.html';
         } catch (error) {
             console.error('Erreur:', error);
             utils.showError(error, "Erreur lors de la soumission de l'évaluation");
@@ -291,8 +422,6 @@ const evaluationManager = {
         });
     }
 };
-
-
 
 
 // Appel automatique au chargement de la page
@@ -512,7 +641,9 @@ document.addEventListener("DOMContentLoaded", () => {
             supprimerEvaluation(evalId);
         }
     });
+
 });
+
 
 
 async function afficherEvaluations() {
@@ -561,7 +692,6 @@ async function afficherEvaluations() {
         console.error(error);
     }
 }
-
 
 async function supprimerEvaluation(evalId) {
     const confirmation = confirm("Êtes-vous sûr de vouloir supprimer cette évaluation ?");
@@ -640,14 +770,73 @@ function getEvaluationIdFromUrl() {
     return params.get('id');
 }
 
+// Fonction pour empêcher la navigation sur la page d'évaluation
+function bloquerNavigation() {
+    console.log('Blocage de la navigation activé');
+
+    // Empêcher TOUTE navigation
+    window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+    });
+
+    // Empêcher le retour arrière
+    window.addEventListener('popstate', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        history.pushState(null, null, window.location.href);
+        alert('Vous devez soumettre votre évaluation avant de quitter.');
+    });
+
+    // Empêcher la navigation par URL
+    window.addEventListener('hashchange', function(e) {
+        e.preventDefault();
+        alert('Vous devez soumettre votre évaluation avant de quitter.');
+    });
+
+    // Empêcher les raccourcis clavier
+    document.addEventListener('keydown', function(e) {
+        if ((e.altKey && ['ArrowLeft', 'ArrowRight'].includes(e.key)) ||
+            (e.ctrlKey && e.key.toLowerCase() === 'w') ||
+            (e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName))) {
+            e.preventDefault();
+            alert('Vous devez soumettre votre évaluation avant de quitter.');
+        }
+    });
+
+    // Forcer l'état de l'historique
+    history.pushState(null, null, window.location.href);
+    history.pushState(null, null, window.location.href);
+    history.pushState(null, null, window.location.href);
+}
+
 // Initialisation de la page d'évaluation
 if (window.location.pathname.includes('passer_evaluation.html')) {
+    // Bloquer IMMÉDIATEMENT toute navigation
+    window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+    });
+
+    // Empêcher le retour arrière immédiatement
+    history.pushState(null, null, window.location.href);
+    window.addEventListener('popstate', function(e) {
+        e.preventDefault();
+        history.pushState(null, null, window.location.href);
+        alert('Vous devez soumettre votre évaluation avant de quitter.');
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
+        // Activer tous les autres blocages une fois la page chargée
+        bloquerNavigation();
         const evaluationId = getEvaluationIdFromUrl();
         if (evaluationId) {
             evaluationManager.chargerEvaluation(evaluationId);
         } else {
-            alert('Aucune évaluation spécifiée');
+            // Marquer l'évaluation comme soumise et rediriger
+            window.evaluationSoumise = true;
             window.location.href = 'dashboard_etudiant.html';
         }
 
@@ -661,32 +850,83 @@ if (window.location.pathname.includes('passer_evaluation.html')) {
     });
 }
 
-// Variable globale pour stocker les notes
-let notesData = [];
-
-// Fonction principale pour afficher les notes
-async function afficherNotesEtudiants() {
+// Fonction pour voir les évaluations de l'enseignant
+async function voirEvaluationsEnseignant() {
     try {
-        const data = await utils.apiRequest('get_notes_etudiants.php');
-        if (!data.success) {
-            throw new Error(data.message || 'Erreur lors du chargement des notes');
+        const niveau = document.getElementById('niveau').value;
+        const module = document.getElementById('module').value;
+
+        const response = await fetch('../api/get_evaluations_enseignant.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                niveau: niveau,
+                module: module
+            })
+        });
+
+        const data = await response.json();
+        const container = document.getElementById('evaluations-container');
+
+        if (data.success && data.evaluations.length > 0) {
+            let html = '<div class="evaluations-grid">';
+
+            // Grouper par niveau
+            const evaluationsParNiveau = {};
+            data.evaluations.forEach(eval => {
+                if (!evaluationsParNiveau[eval.niveau]) {
+                    evaluationsParNiveau[eval.niveau] = [];
+                }
+                evaluationsParNiveau[eval.niveau].push(eval);
+            });
+
+            // Afficher les évaluations par niveau
+            Object.keys(evaluationsParNiveau).sort().forEach(niveau => {
+                const evaluations = evaluationsParNiveau[niveau];
+                html += `
+                    <div class="niveau-section">
+                        <h3>${niveau}</h3>
+                        <div class="evaluations-list">
+                `;
+
+                evaluations.forEach(eval => {
+                    html += `
+                        <div class="evaluation-card">
+                            <h4>${eval.titre}</h4>
+                            <div class="eval-details">
+                                <p><strong>Module:</strong> ${eval.module}</p>
+                                <p><strong>Date:</strong> ${eval.date_evaluation}</p>
+                                <p><strong>Durée:</strong> ${eval.duree_evaluation} minutes</p>
+                            </div>
+                            <div class="eval-actions">
+                                <button onclick="window.location.href='modifier_evaluation.html?id=${eval.id}'" class="btn btn-secondary">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                                <button onclick="supprimerEvaluation(${eval.id})" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                                <a href="consulter_notes.html" class="btn btn-primary">
+                                    <i class="fas fa-chart-bar"></i> Consulter les Notes
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div></div>';
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = '<p class="no-data">Aucune évaluation trouvée.</p>';
         }
-
-        notesData = data.notes || [];
-    
-
-        // Filtrer les notes selon le niveau sélectionné
-        const filtreNiveau = document.getElementById('filtre-niveau').value;
-        const notesFiltrees = notesData.filter(note => 
-            !filtreNiveau || note.niveau === filtreNiveau
-        );
-
-        // Afficher les notes
-        afficherTableauNotes(notesFiltrees);
-
     } catch (error) {
         console.error('Erreur:', error);
-        utils.showError(error, "Erreur lors du chargement des notes");
+        document.getElementById('evaluations-container').innerHTML = 
+            '<p class="error">Une erreur est survenue lors du chargement des évaluations.</p>';
     }
 }
 
@@ -765,42 +1005,15 @@ function filtrerNotes() {
 // Fonction utilitaire pour déterminer la classe CSS de la note
 function getNoteCssClass(note) {
     note = parseFloat(note);
-    if (note >= 16) return 'note-excellent';
-    if (note >= 14) return 'note-tres-bien';
-    if (note >= 12) return 'note-bien';
-    if (note >= 10) return 'note-passable';
-    return 'note-insuffisant';
+    if (note >= 16) return 'text-success';
+    if (note >= 14) return 'text-info';
+    if (note >= 12) return 'text-primary';
+    if (note >= 10) return 'text-warning';
+    return 'text-danger';
 }
 
-// Fonction pour mettre à jour les modules en fonction du niveau et du semestre
-function updateFiltres() {
-    const niveau = document.getElementById('niveau-etudiant').value;
-    const moduleSelect = document.getElementById('module-etudiant');
 
-    // Réinitialiser la liste des modules
-    moduleSelect.innerHTML = '<option value="">Tous les modules</option>';
-
-    // Si nous avons un niveau sélectionné
-    if (niveau && MODULES_PAR_NIVEAU[niveau]) {
-        // Combiner les modules des deux semestres
-        const allModules = [
-            ...MODULES_PAR_NIVEAU[niveau]['Semestre 1'] || [],
-            ...MODULES_PAR_NIVEAU[niveau]['Semestre 2'] || []
-        ];
-        
-        // Trier et supprimer les doublons
-        [...new Set(allModules)].sort().forEach(module => {
-            const option = document.createElement('option');
-            option.value = module;
-            option.textContent = module;
-            moduleSelect.appendChild(option);
-        });
-    }
-
-    // Mettre à jour les évaluations
-    voirEvaluationsEtudiant();
-}
-
+// Fonction pour voir les évaluations de l'étudiant
 async function voirEvaluationsEtudiant() {
     try {
         const niveau = document.getElementById('niveau-etudiant').value;
@@ -814,13 +1027,12 @@ async function voirEvaluationsEtudiant() {
         if (module) params.push(`module=${module}`);
         
         url += params.join('&');
-        
-        // Récupérer les évaluations à venir
+
+        // Récupérer les évaluations à venir et passées
         const dataAVenir = await utils.apiRequest(url);
         // Récupérer les évaluations passées sans filtres
         const dataPassees = await utils.apiRequest('get_evaluations_passees.php');
 
-        // Conteneurs pour les évaluations
         const evaluationsPassees = document.getElementById('evaluations-passees');
         const evaluationsAVenir = document.getElementById('evaluations-a-venir');
         
@@ -837,6 +1049,21 @@ async function voirEvaluationsEtudiant() {
                 // Formatage de la durée
                 let dureeFormatee = utils.formatDuree(eval.duree_evaluation);
 
+                // Vérifier si l'évaluation est disponible
+                const maintenant = new Date();
+                const [annee, mois, jour] = eval.date_evaluation.split('-');
+                const [heures, minutes] = eval.heure_evaluation.split(':');
+                const dateEvaluation = new Date(annee, mois - 1, jour, heures, minutes);
+                
+                // Vérification exacte de la date et l'heure
+                const estDisponible = (
+                    maintenant.getFullYear() === dateEvaluation.getFullYear() &&
+                    maintenant.getMonth() === dateEvaluation.getMonth() &&
+                    maintenant.getDate() === dateEvaluation.getDate() &&
+                    maintenant.getHours() === dateEvaluation.getHours() &&
+                    maintenant.getMinutes() === dateEvaluation.getMinutes()
+                );
+                
                 evalElement.innerHTML = `
                     <h3>${eval.titre}</h3>
                     <div class="eval-details">
@@ -848,56 +1075,82 @@ async function voirEvaluationsEtudiant() {
                         <p><strong>Module:</strong> ${eval.module}</p>
                     </div>
                     <div class="eval-actions">
-                        <button onclick="window.location.href='passer_evaluation.html?id=${eval.id}'" class="btn btn-primary">Passer l'évaluation</button>
+                        ${estDisponible 
+                            ? `<button onclick="window.location.href='passer_evaluation.html?id=${eval.id}'" class="btn btn-primary">Passer l'évaluation</button>`
+                            : `<div class="eval-non-disponible" style="color: red; text-align: center; width: 100%; display: flex; justify-content: center; align-items: center;">Non disponible</div>`
+                        }
                     </div>
                 `;
 
                 evaluationsAVenir.appendChild(evalElement);
             });
-
-            // Afficher un message si aucune évaluation n'est trouvée
-            if (evaluationsAVenir.children.length === 0) {
-                evaluationsAVenir.innerHTML = '<div class="no-eval">Aucune évaluation à venir</div>';
-            }
+        } else {
+            evaluationsAVenir.innerHTML = '<p class="no-data">Aucune évaluation à venir.</p>';
         }
 
         // Afficher les évaluations passées
-        if (dataPassees.success) {
-            dataPassees.evaluations.forEach(eval => {
-                const evalElement = document.createElement('div');
-                evalElement.className = 'evaluation-card passed';
-                
-                // Formatage de la durée
-                let dureeFormatee = utils.formatDuree(eval.duree_evaluation);
+        if (dataPassees.success && dataPassees.evaluations.length > 0) {
+            const table = document.createElement('table');
+            table.className = 'evaluations-table';
+            
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th style="width: 40%">Titre</th>
+                        <th style="width: 40%">Module</th>
+                        <th style="width: 20%">Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            `;
 
-                evalElement.innerHTML = `
-                    <h3>${eval.titre}</h3>
-                    <div class="eval-details">
-                        <p><strong>Date:</strong> ${eval.date_evaluation}</p>
-                        <p><strong>Heure:</strong> ${eval.heure_evaluation}</p>
-                        <p><strong>Durée:</strong> ${dureeFormatee}</p>
-                        <p><strong>Niveau:</strong> ${eval.niveau}</p>
-                        <p><strong>Semestre:</strong> ${eval.semestre}</p>
-                        <p><strong>Module:</strong> ${eval.module}</p>
-                        <p class="note"><strong>Note obtenue:</strong> ${eval.note}/20</p>
-                    </div>
+            // Trier les évaluations par niveau
+            const evaluationsParNiveau = dataPassees.evaluations.reduce((acc, eval) => {
+                if (!acc[eval.niveau]) {
+                    acc[eval.niveau] = [];
+                }
+                acc[eval.niveau].push(eval);
+                return acc;
+            }, {});
+
+            // Trier les niveaux
+            const niveauxTries = Object.keys(evaluationsParNiveau).sort();
+
+            // Ajouter les lignes par niveau
+            niveauxTries.forEach(niveau => {
+                // Ajouter l'en-tête du niveau
+                const headerRow = document.createElement('tr');
+                headerRow.setAttribute('data-niveau', niveau);
+                headerRow.innerHTML = `
+                    <td colspan="3">${niveau}</td>
                 `;
+                table.querySelector('tbody').appendChild(headerRow);
 
-                evaluationsPassees.appendChild(evalElement);
+                // Ajouter les évaluations du niveau
+                evaluationsParNiveau[niveau].forEach(eval => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${eval.titre}</td>
+                        <td>${eval.module}</td>
+                        <td class="note-cell">${eval.note}/20</td>
+                    `;
+                    
+                    table.querySelector('tbody').appendChild(row);
+                });
             });
 
-            // Afficher un message si aucune évaluation passée n'est trouvée
-            if (evaluationsPassees.children.length === 0) {
-                evaluationsPassees.innerHTML = '<div class="no-eval">Aucune évaluation passée</div>';
-            }
+            document.getElementById('evaluations-passees').innerHTML = '';
+            document.getElementById('evaluations-passees').appendChild(table);
+        } else {
+            document.getElementById('evaluations-passees').innerHTML = 
+                '<p class="no-data">Aucune évaluation passée trouvée.</p>';
         }
     } catch (error) {
-        utils.showError(error, "Erreur lors du chargement des évaluations");
+        console.error('Erreur:', error);
+        document.getElementById('evaluations-passees').innerHTML = 
+            '<p class="error">Une erreur est survenue lors du chargement des évaluations.</p>';
     }
 }
-
-
-
-
-
-
+    

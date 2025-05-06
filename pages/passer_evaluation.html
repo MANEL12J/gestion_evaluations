@@ -6,6 +6,34 @@
     <title>Passer l'évaluation</title>
     <link rel="stylesheet" href="../assets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        // Bloquer la navigation immédiatement
+        (function() {
+            // Empêcher le retour arrière
+            history.pushState(null, null, location.href);
+            window.addEventListener('popstate', function() {
+                history.pushState(null, null, location.href);
+                alert('Vous devez soumettre votre évaluation avant de quitter.');
+            });
+
+            // Bloquer la fermeture de la page
+            window.addEventListener('beforeunload', function(e) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            });
+
+            // Bloquer les raccourcis clavier
+            document.addEventListener('keydown', function(e) {
+                if ((e.altKey && ['ArrowLeft', 'ArrowRight'].includes(e.key)) ||
+                    (e.ctrlKey && e.key.toLowerCase() === 'w') ||
+                    (e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName))) {
+                    e.preventDefault();
+                    alert('Vous devez soumettre votre évaluation avant de quitter.');
+                }
+            }, true);
+        })();
+    </script>
 </head>
 <body class="evaluation-page">
     <div class="timer-container">
