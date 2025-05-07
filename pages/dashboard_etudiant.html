@@ -23,18 +23,23 @@
             </h2>
 
             <div class="evaluations-container">
-                <div class="filtres-selection">
-                    <div class="filtre-groupe">
-                        <label for="niveau-etudiant">Niveau :</label>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-    <select id="niveau-etudiant" onchange="updateFiltres()">
-        <option value="">Tous les niveaux</option>
-        <option value="L1">L1</option>
-        <option value="L2">L2</option>
-        <option value="L3">L3</option>
-    </select>
-    <button id="btn-modifier-niveau" class="btn btn-secondary" type="button" style="font-size:0.9em; padding: 7px 14px;">Modifier niveau</button>
-</div>
+                <div class="filtres-selection" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label for="niveau-etudiant">Parcour: </label>
+                        <select id="niveau-etudiant" onchange="updateFiltres()" style="width: 120px;">
+                            <option value="">Tous les Parcours</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                            <option value="L3">L3</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label for="module-etudiant">Module: </label>
+                        <select id="module-etudiant" onchange="voirEvaluationsEtudiant()" style="width: 200px;">
+                            <option value="">Tous les modules</option>
+                        </select>
+                        <button id="btn-modifier-niveau" class="btn btn-secondary" type="button" style="font-size:0.9em; padding: 7px 14px; margin-left: 10px;">Modifier parcours</button>
+                    </div>
 <!-- Modal pour modifier le niveau -->
 <div id="modal-niveau" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); justify-content:center; align-items:center; z-index:9999;">
     <div style="background:white; padding:30px 25px; border-radius:10px; min-width:260px; box-shadow:0 4px 16px rgba(0,0,0,0.12); text-align:center;">
@@ -51,22 +56,20 @@
     </div>
 </div>
                     </div>
-
-                    <div class="filtre-groupe">
-                        <label for="module-etudiant">Module :</label>
-                        <select id="module-etudiant" onchange="voirEvaluationsEtudiant()">
-                            <option value="">Tous les modules</option>
-                        </select>
-                    </div>
                 </div>
                 <div id="evaluations-a-venir" class="evaluations-grid"></div>
+                <div id="no-evaluations" style="text-align: center; padding: 20px; display: none;">
+                    <p style="color: #666; font-size: 1.1em;">Aucune évaluation à venir pour le moment</p>
+                </div>
             </div>
 
-            <h2 class="section-title">
-                <span class="title-icon">📖</span>
-                Évaluations Passées
-            </h2>
-            <div id="evaluations-passees"></div>
+            <div style="margin: 0 150px;">
+                <h2 class="section-title">
+                    <span class="title-icon">📖</span>
+                    Évaluations Passées
+                </h2>
+                <div id="evaluations-passees"></div>
+            </div>
         </section>
     </div>
 
