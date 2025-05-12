@@ -634,13 +634,11 @@ function supprimerReponse(element) {
         reponseDiv.remove();
         console.log("❌ Réponse supprimée !");
     }
-}
-
 
 document.addEventListener("DOMContentLoaded", () => {
     const evaluationsContainer = document.getElementById('mesEvaluations');
     if (!evaluationsContainer) {
-        console.error('Élément "mesEvaluations" introuvable !');
+        console.log('Élément "mesEvaluations" introuvable !');
         return;  // Arrêter l'exécution si l'élément est introuvable
     }
 
@@ -652,16 +650,17 @@ document.addEventListener("DOMContentLoaded", () => {
             supprimerEvaluation(evalId);
         }
     });
-
 });
+}
 
 
 
 async function afficherEvaluations() {
     try {
+        console.log('Début du chargement des évaluations...');
         const response = await fetch('../api/get_evaluations.php');
         const data = await response.json();
-        console.log(data);
+        console.log('Réponse du serveur:', data);
 
         if (data.success) {
             const evaluationsContainer = document.getElementById('mesEvaluations');
@@ -859,14 +858,22 @@ if (window.location.pathname.includes('passer_evaluation.html')) {
             }
         });
     });
-}YA
+}
 
 // Fonction pour voir les évaluations de l'enseignant
 async function voirEvaluationsEnseignant() {
     try {
-        const niveau = document.getElementById('niveau').value;
-        const module = document.getElementById('module').value;
-        const container = document.getElementById('evaluations-container');
+        const niveauElement = document.getElementById('niveau');
+        const moduleElement = document.getElementById('module');
+        const container = document.getElementById('mesEvaluations');
+
+        if (!container) {
+            console.error('Container des évaluations non trouvé');
+            return;
+        }
+
+        const niveau = niveauElement ? niveauElement.value : '';
+        const module = moduleElement ? moduleElement.value : '';
 
         const response = await fetch('../api/get_evaluations_enseignant.php', {
             method: 'POST',
