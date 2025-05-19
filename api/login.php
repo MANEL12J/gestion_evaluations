@@ -16,20 +16,23 @@ $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
 $password = $data['password'];
 
 try {
-    $stmt = $pdo->prepare("SELECT id, password, type FROM utilisateurs WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    // Vérification spéciale pour admin
     if ($email === 'admin' && $password === 'admin2025') {
         $_SESSION['user_id'] = 'admin';
         $_SESSION['user_type'] = 'admin';
-        error_log("Login admin - Session créée: " . print_r($_SESSION, true));
         echo json_encode([
             "success" => true,
             "message" => "Connexion administrateur réussie",
             "type" => "admin"
         ]);
-    } else if ($user && password_verify($password, $user['password'])) {
+        exit;
+    }
+
+    $stmt = $pdo->prepare("SELECT id, password, type FROM utilisateurs WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
         // Stocker les informations dans la session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_type'] = $user['type']; // "enseignant" ou "etudiant"

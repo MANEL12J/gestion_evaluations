@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Professeur</title>
+    <link rel="stylesheet" href="../assets/dashbord_prof.css">
+    <link rel="stylesheet" href="../assets/chat.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <!-- En-tête avec bouton Déconnexion -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1><i class='bx bxs-graduation'></i> Dashboard Enseignant</h1>
+                <div class="header-actions">
+                    <a href="creer_evaluation.html" class="btn btn-success">
+                        <i class='bx bx-plus-circle'></i> Nouvelle Évaluation
+                    </a>
+                    <a href="consulter_notes.html" class="btn btn-primary">
+                        <i class='bx bx-bar-chart-alt-2'></i> Consulter les Notes
+                    </a>
+                    <button onclick="auth.logout()" class="btn logout-btn">
+                        <i class='bx bx-log-out'></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- Section Mes Évaluations -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2><i class='bx bx-list-ul'></i> Mes Évaluations</h2>
+                
+            </div>
+            <div id="mesEvaluations" class="evaluations-grid"></div>
+        </section>
+
+       
+    </div>
+
+    <script src="../assets/scripts.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            afficherEvaluations();
+        });
+    </script>
+    <script src="../assets/chat.js"></script>
+</body>
+</html>

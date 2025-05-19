@@ -142,13 +142,13 @@ const utils = {
 
         try {
             const response = await fetch(API_URL + endpoint, options);
-            const responseData = await response.json();
-
-            if (!responseData.success && responseData.message) {
-                throw new Error(responseData.message);
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
             }
 
-            return responseData;
+            const responseData = await response.json();
+            return responseData; // Retourner toute la réponse, même en cas d'erreur
+
         } catch (error) {
             console.error("Erreur API:", error);
             throw error;
@@ -205,19 +205,17 @@ const auth = {
             }
 
             const data = await utils.apiRequest("login.php", "POST", { email, password });
+            
             let redirectPage;
             if (data.type === "admin") {
                 redirectPage = "dashboard_admin.html";
-            } else if (data.type === "etudiant") {
-                redirectPage = "dashboard_etudiant.html";
             } else {
-                // Si ce n'est ni admin ni étudiant, retour à la page de connexion
-                redirectPage = "login.html";
+                redirectPage = data.type === "etudiant" ? "dashboard_etudiant.html" : "dashboard_prof.html";
             }
+            
             utils.redirect(redirectPage);
         } catch (error) {
             utils.showError(error, "Erreur lors de la connexion");
-            utils.redirect("login.html");
         }
     },
 
