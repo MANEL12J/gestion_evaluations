@@ -163,7 +163,8 @@ const utils = {
 
     // Redirection sécurisée
     redirect(path) {
-        window.location.href = path;
+        const baseUrl = '/gestion_evaluations/pages/';
+        window.location.href = baseUrl + path;
     },
 
     // Formater la durée
@@ -204,10 +205,19 @@ const auth = {
             }
 
             const data = await utils.apiRequest("login.php", "POST", { email, password });
-            const redirectPage = data.type === "etudiant" ? "dashboard_etudiant.html" : "dashboard_prof.html";
+            let redirectPage;
+            if (data.type === "admin") {
+                redirectPage = "dashboard_admin.html";
+            } else if (data.type === "etudiant") {
+                redirectPage = "dashboard_etudiant.html";
+            } else {
+                // Si ce n'est ni admin ni étudiant, retour à la page de connexion
+                redirectPage = "login.html";
+            }
             utils.redirect(redirectPage);
         } catch (error) {
             utils.showError(error, "Erreur lors de la connexion");
+            utils.redirect("login.html");
         }
     },
 
@@ -652,7 +662,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 }
-
 
 
 async function afficherEvaluations() {

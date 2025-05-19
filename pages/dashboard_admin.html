@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Administrateur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class='bx bx-shield-quarter'></i>
+                Gestion des Évaluations - Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="btnDeconnexion">
+                            <i class='bx bx-log-out'></i>
+                            Déconnexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class='bx bxs-dashboard'></i> Tableau de Bord</h1>
+            <span class="badge-admin">Administrateur</span>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-container">
+            <div class="row g-0">
+                <div class="col-6">
+                    <div class="stat-item">
+                        <i class='bx bx-user-circle' style="font-size: 1.5rem; color: var(--secondary-color);"></i>
+                        <div class="stat-content">
+                            <div class="stat-number" id="nombre-etudiants">...</div>
+                            <div class="stat-label">Étudiants</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-item">
+                        <i class='bx bx-chalkboard' style="font-size: 1.5rem; color: var(--secondary-color);"></i>
+                        <div class="stat-content">
+                            <div class="stat-number" id="nombre-enseignants">...</div>
+                            <div class="stat-label">Enseignants</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Liste des professeurs -->
+            <div class="col-md-4">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <i class='bx bx-user admin-icon'></i> Liste des Enseignants
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" id="liste-profs">
+                            <!-- La liste des profs sera ajoutée ici -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Détails des évaluations -->
+            <div class="col-md-8">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <i class='bx bx-book-content admin-icon'></i> 
+                        <span id="titre-evaluations">Sélectionnez un enseignant</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Licence 1 -->
+                        <div class="niveau-section mb-4">
+                            <h4 class="niveau-title"><i class='bx bx-book'></i> Licence 1</h4>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Évaluation</th>
+                                            <th>Module</th>
+                                            <th>Semestre</th>
+                                            <th>Étudiants</th>
+                                            <th>Moyenne/20</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="liste-evaluations-l1">
+                                        <!-- Les évaluations L1 seront ajoutées ici -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Licence 2 -->
+                        <div class="niveau-section mb-4">
+                            <h4 class="niveau-title"><i class='bx bx-book'></i> Licence 2</h4>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Évaluation</th>
+                                            <th>Module</th>
+                                            <th>Semestre</th>
+                                            <th>Étudiants</th>
+                                            <th>Moyenne/20</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="liste-evaluations-l2">
+                                        <!-- Les évaluations L2 seront ajoutées ici -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Licence 3 -->
+                        <div class="niveau-section">
+                            <h4 class="niveau-title"><i class='bx bx-book'></i> Licence 3</h4>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Évaluation</th>
+                                            <th>Module</th>
+                                            <th>Semestre</th>
+                                            <th>Étudiants</th>
+                                            <th>Moyenne/20</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="liste-evaluations-l3">
+                                        <!-- Les évaluations L3 seront ajoutées ici -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fonction pour charger les statistiques
+        function chargerStatistiques() {
+            fetch('../api/get_stats.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('nombre-etudiants').textContent = data.stats.etudiants;
+                        document.getElementById('nombre-enseignants').textContent = data.stats.enseignants;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des statistiques:', error);
+                });
+        }
+
+        // Fonction pour charger la liste des professeurs
+        function chargerProfesseurs() {
+            fetch('../api/get_profs_evaluations.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const listeProfs = document.getElementById('liste-profs');
+                        listeProfs.innerHTML = '';
+                        
+                        data.professeurs.forEach(prof => {
+                            const item = document.createElement('a');
+                            item.href = '#';
+                            item.className = 'list-group-item list-group-item-action d-flex align-items-center';
+                            item.innerHTML = `
+                                <i class='bx bx-user-circle me-2'></i>
+                                ${prof.nom}
+                            `;
+                            item.onclick = (e) => {
+                                e.preventDefault();
+                                chargerEvaluationsProf(prof.id, prof.nom);
+                                // Activer l'élément sélectionné
+                                document.querySelectorAll('#liste-profs .active').forEach(el => el.classList.remove('active'));
+                                item.classList.add('active');
+                            };
+                            listeProfs.appendChild(item);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des professeurs:', error);
+                });
+        }
+
+        // Fonction pour charger les évaluations d'un professeur
+        function chargerEvaluationsProf(profId, profNom) {
+            document.getElementById('titre-evaluations').textContent = `Évaluations de ${profNom}`;
+            
+            fetch(`../api/get_profs_evaluations.php?prof_id=${profId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Réinitialiser tous les tableaux
+                        ['l1', 'l2', 'l3'].forEach(niveau => {
+                            const tbody = document.getElementById(`liste-evaluations-${niveau}`);
+                            tbody.innerHTML = '';
+                        });
+                        
+                        // Vérifier si des évaluations existent
+                        const hasEvaluations = Object.values(data.evaluations).some(arr => arr.length > 0);
+                        if (!hasEvaluations) {
+                            ['l1', 'l2', 'l3'].forEach(niveau => {
+                                document.getElementById(`liste-evaluations-${niveau}`).innerHTML = `
+                                    <tr>
+                                        <td colspan="5" class="text-center">Aucune évaluation trouvée</td>
+                                    </tr>
+                                `;
+                            });
+                            return;
+                        }
+                        
+                        // Remplir chaque tableau avec ses évaluations
+                        Object.entries(data.evaluations).forEach(([niveau, evaluations]) => {
+                            const niveauLower = niveau.toLowerCase();
+                            const tbody = document.getElementById(`liste-evaluations-${niveauLower}`);
+                            
+                            if (evaluations.length === 0) {
+                                tbody.innerHTML = `
+                                    <tr>
+                                        <td colspan="5" class="text-center">Aucune évaluation pour ce niveau</td>
+                                    </tr>
+                                `;
+                                return;
+                            }
+                            
+                            evaluations.forEach(eval => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${eval.titre}</td>
+                                    <td>${eval.module}</td>
+                                    <td>${eval.semestre}</td>
+                                    <td>${eval.nombre_etudiants}</td>
+                                    <td>${eval.moyenne_classe}</td>
+                                `;
+                                tbody.appendChild(row);
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des évaluations:', error);
+                });
+        }
+
+        document.getElementById('btnDeconnexion').addEventListener('click', function() {
+            fetch('../api/logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = 'login.html';
+                    }
+                });
+        });
+
+        // Vérification de la session admin et chargement initial
+        console.log('Vérification de la session...');
+        fetch('../api/verifier_session.php')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Réponse de verifier_session.php:', data);
+                if (data.status === 'success' && data.user_type === 'admin') {
+                    console.log('Session admin valide - user_type:', data.user_type);
+                    chargerStatistiques();
+                    chargerProfesseurs(); // Charger la liste des professeurs
+                } else {
+                    console.log('Session non valide - status:', data.status, 'user_type:', data.user_type);
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la vérification:', error);
+                window.location.href = 'login.html';
+            });
+    </script>
+</body>
+</html>
