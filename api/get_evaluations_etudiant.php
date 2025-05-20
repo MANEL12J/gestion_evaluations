@@ -26,18 +26,28 @@ try {
         SELECT 
             e.id,
             e.titre,
-            DATE_FORMAT(e.date_evaluation, '%Y-%m-%d') as date_evaluation,
-            DATE_FORMAT(e.heure_evaluation, '%H:%i') as heure_evaluation,
+            e.date_evaluation,
+            e.heure_evaluation,
             e.duree_evaluation,
             e.niveau,
             e.semestre,
             e.module
         FROM evaluations e
-        WHERE NOT EXISTS (
+        WHERE (
+            -- Évaluations à venir
+            CONCAT(e.date_evaluation, ' ', e.heure_evaluation) > NOW()
+            OR
+            -- Évaluations en cours (pendant leur durée)
+            (CONCAT(e.date_evaluation, ' ', e.heure_evaluation) <= NOW()
+             AND DATE_ADD(CONCAT(e.date_evaluation, ' ', e.heure_evaluation), 
+                         INTERVAL e.duree_evaluation MINUTE) >= NOW())
+        )
+        AND NOT EXISTS (
             SELECT 1 FROM soumissions s
             WHERE s.evaluation_id = e.id
             AND s.etudiant_id = ?
-        )";
+        )
+        AND e.archive = 0";
 
     $params = [$_SESSION['user_id']];
 

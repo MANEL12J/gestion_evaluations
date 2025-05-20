@@ -13,7 +13,32 @@
         <!-- En-tête avec bouton de déconnexion -->
         <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
             <h1>🎓 Dashboard Étudiant</h1>
-            <button onclick="auth.logout()" class="btn logout-btn">🔓 Déconnexion</button>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="afficherMesNotes()" class="btn btn-primary">📊 Consulter mes notes</button>
+                <button onclick="auth.logout()" class="btn logout-btn">🔓 Déconnexion</button>
+            </div>
+        </div>
+
+        <!-- Modal pour afficher les notes -->
+        <div id="modal-notes" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); justify-content:center; align-items:center; z-index:9999;">
+            <div style="background:white; padding:25px; border-radius:12px; width:1000px; max-height:85vh; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,0.15);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; border-bottom:2px solid #f0f0f0; padding-bottom:15px;">
+                    <h3 style="margin:0; font-size:1.8em; color:#2c3e50;">Mes Notes</h3>
+                    <button onclick="document.getElementById('modal-notes').style.display='none'" class="btn btn-secondary" style="padding:4px 12px; font-size:12px; line-height:1.5; min-width:60px; max-width:60px;">Retour</button>
+                </div>
+                
+                <!-- Sélecteur de niveau pour les notes -->
+                <div style="margin-bottom: 25px; text-align:center; background:#f8f9fa; padding:15px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                    <label for="niveau-notes" style="margin-right: 15px; font-weight:600; color:#2c3e50;">Niveau :</label>
+                    <select id="niveau-notes" onchange="chargerNotes()" style="padding: 8px 15px; border-radius:6px; border:1px solid #e0e0e0; font-size:14px; background-color:white; cursor:pointer;">
+                        <option value="L1">L1</option>
+                        <option value="L2">L2</option>
+                        <option value="L3">L3</option>
+                    </select>
+                </div>
+
+                <div id="notes-container"></div>
+            </div>
         </div>
         
 
@@ -23,8 +48,8 @@
                 Prochaines Évaluations
             </h2>
 
-            <div class="evaluations-container">
-                <div class="filtres-selection" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+            <div class="evaluations-container filtres-container">
+                <div class="filtres-selection" style="display: flex; align-items: center; gap: 15px; margin-bottom: 5px;">
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <label for="niveau-etudiant">Parcour: </label>
                         <select id="niveau-etudiant" onchange="updateFiltres()" style="width: 120px;">
@@ -36,7 +61,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <label for="module-etudiant">Module: </label>
-                        <select id="module-etudiant" onchange="voirEvaluationsEtudiant()" style="width: 200px;">
+                        <select id="module-etudiant" style="width: 200px;">
                             <option value="">Tous les modules</option>
                         </select>
                         <button id="btn-modifier-niveau" class="btn btn-secondary" type="button" style="font-size:0.9em; padding: 7px 14px; margin-left: 10px;">Modifier parcours</button>
@@ -58,18 +83,21 @@
 </div>
                     </div>
                 </div>
+
                 <div id="evaluations-a-venir" class="evaluations-grid"></div>
                 <div id="no-evaluations" style="text-align: center; padding: 20px; display: none;">
                     <p style="color: #666; font-size: 1.1em;">Aucune évaluation à venir pour le moment</p>
                 </div>
             </div>
 
-            <div style="margin: 0 150px;">
+           
+
+            <div class="evaluations-container evaluations-ratees-container">
                 <h2 class="section-title">
-                    <span class="title-icon">📖</span>
-                    Évaluations Passées
+                    <span class="title-icon">⚠️</span>
+                    Évaluations Ratées
                 </h2>
-                <div id="evaluations-passees"></div>
+                <div id="evaluations-ratees"></div>
             </div>
         </section>
     </div>
@@ -77,9 +105,22 @@
     <script src="../assets/modules.js"></script>
     <script src="../assets/scripts.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            voirEvaluationsEtudiant();
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialiser la liste des modules avec le niveau actuel
+            const niveauSelect = document.getElementById('niveau-etudiant');
+            if (niveauSelect?.value) {
+                updateModulesList(niveauSelect.value);
+            }
+
+            // Charger les évaluations
+            await updateFiltres();
         });
+
+        // Mettre à jour les filtres quand le niveau change
+        document.getElementById('niveau-etudiant').addEventListener('change', updateFiltres);
+
+        // Mettre à jour les filtres quand le module change
+        document.getElementById('module-etudiant').addEventListener('change', updateFiltres);
     </script>
     <script src="../assets/chat.js"></script>
 </body>

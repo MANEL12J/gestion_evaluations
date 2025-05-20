@@ -728,18 +728,236 @@ footer {
     color: var(--primary);
 }
 
-.evaluations-grid {
-    width: 100%;
-    margin: 0;
-    padding: 0;
+/* Styles pour les sections d'évaluations */
+.section-title {
+    color: var(--text-dark);
+    font-size: 1.5em;
+    margin: 2rem 0 1.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-@media (max-width: 1200px) {
-    .evaluations-grid { grid-template-columns: repeat(2, 1fr); }
+.title-icon {
+    font-size: 1.5em;
+}
+
+.evaluations-container {
+    padding: 1.5rem;
+}
+
+.evaluations-ratees-container {
+    margin-left: 130px;
+    margin-right: 130px;
+}
+
+.evaluations-container + .evaluations-container {
+    margin-top: 0px;
+}
+
+/* Styles pour les grilles d'évaluations */
+.evaluations-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.evaluation-item {
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border: 1px solid var(--border-light);
+    transition: var(--transition);
+}
+
+.evaluation-item:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.evaluation-item.a-venir {
+    border-left: 4px solid var(--primary);
+}
+
+.evaluation-item.ratee {
+    border-left: 4px solid var(--danger);
+}
+
+.evaluation-titre {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.evaluation-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.95em;
+    margin-top: 1rem;
+}
+
+.evaluation-info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.evaluation-info-label {
+    color: var(--text-dark);
+    min-width: 80px;
+}
+
+.evaluation-info-value {
+    color: var(--text-medium);
+}
+
+.evaluation-status {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.evaluation-indisponible {
+    color: var(--text-medium);
+    font-style: italic;
+}
+
+.btn-passer-evaluation {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-passer-evaluation:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
-    .evaluations-grid { grid-template-columns: 1fr; }
+    .evaluations-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Message quand il n'y a pas d'évaluations */
+.no-evaluations {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-light);
+    border-radius: var(--radius-lg);
+    color: var(--text-medium);
+    font-size: 1.1em;
+    margin: 1rem 0;
+}
+
+/* Style pour les dates */
+.date-evaluation {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Style pour les durées */
+.duree-evaluation {
+    color: var(--text-medium);
+    font-size: 0.9em;
+}
+
+/* Style pour les modules */
+.module-evaluation {
+    font-weight: 500;
+    color: var(--primary);
+}
+
+/* Style pour les semestres */
+.semestre-evaluation {
+    text-align: center;
+    background: var(--bg-light);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+}
+
+/* Style pour les filtres */
+.filtres-selection {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.filtres-selection label {
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.filtres-selection select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--bg-white);
+    color: var(--text-dark);
+    font-size: 0.95em;
+    transition: var(--transition);
+}
+
+.filtres-selection select:hover,
+.filtres-selection select:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filtres-selection {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+    }
+
+    .table tbody td {
+        display: block;
+        text-align: right;
+        padding: 0.5rem 0;
+        border: none;
+    }
+
+    .table tbody td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 500;
+        color: var(--text-medium);
+    }
 }
 
 .evaluation-card {
@@ -1468,18 +1686,26 @@ section {
 
 .evaluations-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin: 15px 0;
-    padding: 10px;
+    gap: 20px;
+    width: 900px; /* Largeur fixe pour 3 évaluations */
+    margin: 0 auto;
+    grid-template-columns: repeat(3, 280px); /* 3 colonnes de largeur fixe */
 }
 
 @media (max-width: 1200px) {
-    .evaluations-grid { grid-template-columns: repeat(2, 1fr); }
+    .evaluations-grid {
+        width: 600px; /* Largeur fixe pour 2 évaluations */
+        grid-template-columns: repeat(2, 280px); /* 2 colonnes de largeur fixe */
+        gap: 20px;
+    }
 }
 
 @media (max-width: 768px) {
-    .evaluations-grid { grid-template-columns: 1fr; }
+    .evaluations-grid {
+        width: 280px; /* Largeur fixe pour 1 évaluation */
+        grid-template-columns: 280px; /* 1 colonne de largeur fixe */
+        gap: 15px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -1766,8 +1992,11 @@ section {
 .filtres-selection {
     display: flex;
     gap: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
+    background: var(--bg-white);
+    padding: 15px;
+    border-radius: var(--radius-md);
 }
 
 .filtre-groupe {
