@@ -1,26 +1,33 @@
 // Configuration de base
-const API_URL = "http://localhost/gestion_evaluations/api/";
+const API_URL = window.location.origin + "/gestion_evaluations/api/";
 
 // Utilitaires
 
 // Fonction pour mettre à jour les filtres de notes
 async function updateFiltresNotes() {
     // Charger les notes avec les filtres actuels
-    chargerNotes();
+    chargerNotesTous();
 }
 
 // Fonction pour charger et afficher les notes
-async function chargerNotes() {
+async function chargerNotesTous() {
+    console.log('Début de chargerNotesTous');
     const notesContainer = document.getElementById('notes-container');
-    if (!notesContainer) return;
+    if (!notesContainer) {
+        console.error('Container notes-container non trouvé');
+        return;
+    }
 
     // Récupérer les valeurs des filtres
-    const niveau = document.getElementById('niveau-notes').value;
-    const semestre = document.getElementById('semestre-notes').value;
-    const module = document.getElementById('module-notes').value;
+    const niveau = document.getElementById('niveau-notes')?.value || '';
+    const semestre = document.getElementById('semestre-notes')?.value || '';
+    const module = document.getElementById('module-notes')?.value || '';
+
+    console.log('Filtres sélectionnés:', { niveau, semestre, module });
 
     // Si aucun filtre n'est sélectionné, afficher le message initial
     if (!niveau && !semestre && !module) {
+        console.log('Aucun filtre sélectionné');
         notesContainer.innerHTML = `
             <div class="select-filters-message">
                 <i class='bx bx-filter-alt'></i>
@@ -31,100 +38,135 @@ async function chargerNotes() {
     }
 
     try {
+        notesContainer.innerHTML = '<div class="loading">Chargement des notes...</div>';
+
         // Construire l'URL avec les paramètres de filtrage
         let url = `${API_URL}get_notes_etudiants.php`;
         const params = [];
-        if (niveau) params.push(`niveau=${niveau}`);
+        if (niveau) params.push(`niveau=${encodeURIComponent(niveau)}`);
         if (semestre) {
             // Convertir S1/S2 en format de la base de données
             const semestreValue = semestre === 'S1' ? 'Semestre 1' : 'Semestre 2';
-            params.push(`semestre=${semestreValue}`);
+            params.push(`semestre=${encodeURIComponent(semestreValue)}`);
         }
         if (module) params.push(`module=${encodeURIComponent(module)}`);
         
         url += '?' + params.join('&');
+        console.log('URL de requête:', url);
 
         const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.success && data.evaluations) {
-            notesContainer.innerHTML = '';
-            
-            if (data.evaluations.length > 0) {
-                // Pour chaque évaluation
-                data.evaluations.forEach(evalData => {
-                    // Titre de l'évaluation
-                    const evalTitle = document.createElement('h3');
-                    evalTitle.className = 'evaluation-title';
-                    evalTitle.textContent = evalData.evaluation.evaluation_titre;
-                    notesContainer.appendChild(evalTitle);
-                    
-                    const table = document.createElement('table');
-                    table.className = 'notes-table';
-
-                    // En-tête du tableau
-                    table.innerHTML = `
-                        <thead>
-                            <tr>
-                                <th>Étudiant</th>
-                                <th>Parcours</th>
-                                <th>Semestre</th>
-                                <th>Module</th>
-                                <th>Note</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    `;
-                    
-                    if (evalData.notes && evalData.notes.length > 0) {
-                        // Ajouter les lignes de notes
-                        evalData.notes.forEach(note => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>
-                                    <div class="student-name">
-                                        <i class='bx bx-user'></i>
-                                        ${note.etudiant_nom}
-                                    </div>
-                                </td>
-                                <td>${evalData.evaluation.niveau}</td>
-                                <td>${evalData.evaluation.semestre}</td>
-                                <td>${evalData.evaluation.module}</td>
-                                <td>
-                                    <div class="note-value ${getNoteCssClass(note.note)}">
-                                        ${note.note}/20
-                                    </div>
-                                </td>
-                            `;
-                            table.querySelector('tbody').appendChild(tr);
-                        });
-                    } else {
-                        // Aucune note pour cette évaluation
-                        table.querySelector('tbody').innerHTML = `
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 20px;">
-                                    Aucune note pour cette évaluation
-                                </td>
-                            </tr>
-                        `;
-                    }
-
-                    notesContainer.appendChild(table);
-                });
-            } else {
-                notesContainer.innerHTML = `
-                    <div class="no-data" style="text-align: center; padding: 20px;">
-                        Aucune évaluation trouvée pour les critères sélectionnés
-                    </div>
-                `;
-            }
-        } else {
-            notesContainer.innerHTML = '<p>Erreur lors du chargement des notes.</p>';
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const data = await response.json();
+        console.log('Réponse API:', data);
+
+        if (!data.success) {
+            throw new Error(data.message || 'Erreur lors de la récupération des notes');
+        }
+
+        if (!data.evaluations || data.evaluations.length === 0) {
+            notesContainer.innerHTML = `
+                <div class="no-data-message">
+                    <i class='bx bx-info-circle'></i>
+                    <p>Aucune évaluation trouvée pour les critères sélectionnés</p>
+                </div>
+            `;
+            return;
+        }
+
+        notesContainer.innerHTML = '';
+            
+            // Pour chaque évaluation
+            data.evaluations.forEach(evalData => {
+                console.log('Traitement évaluation:', evalData);
+                
+                // Créer le conteneur pour l'évaluation
+                const evalContainer = document.createElement('div');
+                evalContainer.className = 'evaluation-container';
+                
+                // Titre de l'évaluation
+                const evalTitle = document.createElement('h3');
+                evalTitle.className = 'evaluation-title';
+                evalTitle.textContent = evalData.evaluation.evaluation_titre;
+                evalContainer.appendChild(evalTitle);
+                
+                const table = document.createElement('table');
+                table.className = 'notes-table';
+
+                // En-tête du tableau
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Étudiant</th>
+                            <th>Parcours</th>
+                            <th>Semestre</th>
+                            <th>Module</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+                
+                if (evalData.notes && evalData.notes.length > 0) {
+                    console.log('Notes pour évaluation:', evalData.notes);
+                    // Ajouter les lignes de notes
+                    evalData.notes.forEach(note => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div class="student-name">
+                                    <i class='bx bx-user'></i>
+                                    ${note.etudiant_nom}
+                                </div>
+                            </td>
+                            <td>${evalData.evaluation.niveau}</td>
+                            <td>${evalData.evaluation.semestre}</td>
+                            <td>${evalData.evaluation.module}</td>
+                            <td>
+                                <div class="note-value ${getNoteCssClass(note.note)}">
+                                    ${parseFloat(note.note).toFixed(2)}/20
+                                </div>
+                            </td>
+                        `;
+                        table.querySelector('tbody').appendChild(tr);
+                    });
+                } else {
+                    // Ajouter un message si pas de notes
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td colspan="5" class="no-data">
+                            <div class="text-center">
+                                <i class='bx bx-info-circle'></i>
+                                Aucune note pour cette évaluation
+                            </div>
+                        </td>
+                    `;
+                    table.querySelector('tbody').appendChild(tr);
+                }
+
+                evalContainer.appendChild(table);
+                notesContainer.appendChild(evalContainer);
+            });
     } catch (error) {
         console.error('Erreur:', error);
-        notesContainer.innerHTML = '<p>Erreur lors du chargement des notes.</p>';
+        notesContainer.innerHTML = `
+            <div class="error-message">
+                <i class='bx bx-error'></i>
+                <p>Erreur lors du chargement des notes</p>
+                <small>${error.message}</small>
+            </div>
+        `;
     }
+}
+
+function getNoteCssClass(note) {
+    note = parseFloat(note);
+    if (note >= 16) return 'note-excellent';
+    if (note >= 14) return 'note-tres-bien';
+    if (note >= 12) return 'note-bien';
+    if (note >= 10) return 'note-passable';
+    return 'note-insuffisant';
 }
 
 const utils = {

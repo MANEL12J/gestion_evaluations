@@ -15,15 +15,53 @@
         }
         .note-value {
             font-weight: bold;
-            padding: 4px 8px;
             border-radius: 4px;
             display: inline-block;
+            font-weight: bold;
+            min-width: 70px;
+            text-align: center;
         }
+        
+        .note-excellent {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .note-tres-bien {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .note-bien {
+            background-color: #ffc107;
+            color: black;
+        }
+        
+        .note-passable {
+            background-color: #fd7e14;
+            color: black;
+        }
+        
+        .note-insuffisant {
+            background-color: #dc3545;
+            color: white;
+        }
+        .evaluation-container {
+            display: flex;
+            margin: 20px 0;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
         .evaluation-title {
             color: #333;
-            margin: 30px 0 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
+            font-size: 1.2em;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+            border-radius: 4px;
+            min-width: 200px;
+            margin: 0;
         }
         .evaluation-title:first-child {
             margin-top: 0;
@@ -56,12 +94,55 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-        .select-filters-message {
+        .select-filters-message,
+        .loading,
+        .error-message,
+        .no-data-message {
             text-align: center;
             padding: 40px 20px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .loading,
+        .error-message,
+        .no-data-message {
+            margin: 20px 0;
+        }
+
+        .loading i,
+        .error-message i,
+        .no-data-message i {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .error-message {
+            color: #dc3545;
+        }
+
+        .error-message small {
+            display: block;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .no-data i {
+            font-size: 1.2em;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .text-center {
+            text-align: center;
         }
         .select-filters-message i {
             font-size: 2.5em;
@@ -151,9 +232,25 @@
     <script src="../assets/modules.js"></script>
     <script src="../assets/scripts.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initialisation de la page consulter_notes.html');
+        function initPage() {
+            console.log('DOMContentLoaded - Initialisation des écouteurs d\'événements');
+            
+            const niveauSelect = document.getElementById('niveau-notes');
+            const semestreSelect = document.getElementById('semestre-notes');
+            const moduleSelect = document.getElementById('module-notes');
+            
+            if (!niveauSelect || !semestreSelect || !moduleSelect) {
+                console.error('Un ou plusieurs éléments select non trouvés:', {
+                    niveauSelect: !!niveauSelect,
+                    semestreSelect: !!semestreSelect,
+                    moduleSelect: !!moduleSelect
+                });
+                return;
+            }
             // Ajouter des event listeners pour les changements
-            document.getElementById('niveau-notes').addEventListener('change', function() {
+            niveauSelect.addEventListener('change', function() {
+                console.log('Changement de niveau:', this.value);
                 const semestreSelect = document.getElementById('semestre-notes');
                 const moduleSelect = document.getElementById('module-notes');
                 
@@ -170,10 +267,11 @@
                 moduleSelect.innerHTML = '<option value="">Tous les modules</option>';
                 
                 // Charger les notes
-                chargerNotes();
+                chargerNotesTous();
             });
             
-            document.getElementById('semestre-notes').addEventListener('change', function() {
+            semestreSelect.addEventListener('change', function() {
+                console.log('Changement de semestre:', this.value);
                 const niveau = document.getElementById('niveau-notes').value;
                 const moduleSelect = document.getElementById('module-notes');
                 
@@ -195,14 +293,25 @@
                 }
                 
                 // Charger les notes
-                chargerNotes();
+                chargerNotesTous();
             });
             
-            document.getElementById('module-notes').addEventListener('change', chargerNotes);
+            moduleSelect.addEventListener('change', function() {
+                console.log('Changement de module:', this.value);
+                chargerNotesTous();
+            });
             
             // Charger les notes initiales
-            chargerNotes();
-        });
+            console.log('Chargement initial des notes');
+            chargerNotesTous();
+        }
+
+        // S'assurer que le DOM est chargé avant d'initialiser
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPage);
+        } else {
+            initPage();
+        }
     </script>
 </body>
 </html>

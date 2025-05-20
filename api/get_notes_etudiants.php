@@ -1,7 +1,9 @@
 <?php
-session_start();
+require_once 'session.php';
 header('Content-Type: application/json');
 require_once 'config.php';
+
+checkSession();
 
 try {
     // Vérifier que l'utilisateur est connecté et est un professeur
