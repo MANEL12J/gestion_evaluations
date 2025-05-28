@@ -96,6 +96,8 @@ body {
     display: flex;
     gap: var(--space-md);
     align-items: center;
+    margin-left: auto;
+    min-width: 200px;
 }
 
 .header-actions .btn {
@@ -117,6 +119,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 30rem;
 }
 
 .header-content h1 {
@@ -750,10 +753,14 @@ footer {
     padding: 1.5rem;
 }
 
-.evaluations-ratees-container {
-    margin-left: 130px;
-    margin-right: 130px;
+#evaluations-a-venir,
+#evaluations-ratees {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
 }
+
+/* Margins for evaluations-ratees-container are inherited from .evaluations-container */
 
 .evaluations-container + .evaluations-container {
     margin-top: 0px;
@@ -1515,7 +1522,7 @@ footer {
 /* Supprimé car déjà défini plus haut */
 
 .container {
-    max-width: 1000px;
+   
     margin: 40px auto;
     padding: 20px;
     background: #fff;
@@ -1633,10 +1640,10 @@ section {
 }
 
 .evaluations-container {
-    background: white;
+  
     padding: 20px;
     border-radius: 10px;
-    margin-bottom: 30px;
+   
 }
 
 .parcours-selection {
@@ -1930,8 +1937,7 @@ section {
 .main-content {
     padding: 0;
     width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
+    margin: 40px auto;
     background: var(--bg-gradient);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
