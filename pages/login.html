@@ -5,43 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/login.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <title>Connexion - Gestion des Évaluations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>EVALUP - Connexion</title>
 </head>
 <body class="login-page">
     <div class="login-container">
-        <div class="login-box">
-            <div class="login-header">
-                <i class='bx bxs-graduation'></i>
-                <h1>Connexion</h1>
-                <p>Accédez à votre compte</p>
-            </div>
-            
-            <form id="loginForm" class="login-form">
-                <div class="form-group">
-                    <label for="email">
-                        <i class='bx bx-envelope'></i>
-                        Email
-                    </label>
-                    <input type="email" id="email" name="email" required>
+        <div class="login-form-column">
+            <div class="login-box">
+                <div class="login-header">
+                    <i class='bx bx-clipboard'></i> <!-- Changed icon to clipboard -->
+                    <h1>EVALUP</h1>
+                    <p>Connectez-vous pour accéder à la plateforme</p>
                 </div>
+                
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class='bx bx-envelope'></i>
+                            Email
+                        </label>
+                        <input type="email" id="email" name="email" required placeholder="exemple@domaine.com">
+                    </div>
 
-                <div class="form-group">
-                    <label for="password">
-                        <i class='bx bx-lock-alt'></i>
-                        Mot de passe
-                    </label>
-                    <input type="password" id="password" name="password" required>
+                    <div class="form-group">
+                        <label for="password">
+                            <i class='bx bx-lock-alt'></i>
+                            Mot de passe
+                        </label>
+                        <input type="password" id="password" name="password" required placeholder="Votre mot de passe">
+                    </div>
+
+                    <button type="button" onclick="auth.login()" class="login-btn">
+                        <i class='bx bx-log-in'></i>
+                        Se connecter
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <p>Pas encore inscrit ? <a href="register.html">Créer un compte</a></p>
                 </div>
-
-                <button type="button" onclick="auth.login()" class="login-btn">
-                    <i class='bx bx-log-in'></i>
-                    Se connecter
-                </button>
-            </form>
-
-            <div class="login-footer">
-                <p>Pas encore inscrit ? <a href="register.html">Créer un compte</a></p>
             </div>
+        </div>
+        <div class="login-image-column">
+            <img src="../assets/images/login-illustration.png" alt="Illustration EVALUP">
         </div>
     </div>
     <script src="../assets/scripts.js"></script>

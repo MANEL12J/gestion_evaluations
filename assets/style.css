@@ -34,7 +34,7 @@
     /* Couleurs de fond */
     --bg-light: #f4f4f4;
     --bg-white: #ffffff;
-    --bg-gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+    --bg-gradient:linear-gradient(135deg, #667eea, #764ba2);
     
     /* Bordures et ombres */
     --border-light: #e0e6ed;

@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription - Système de Gestion des Évaluations</title>
-    <link rel="stylesheet" href="../assets/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>EVALUP - Inscription</title>
+    <link rel="stylesheet" href="../assets/register.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="register-page">
     <div class="register-container">
         <div class="register-box">
             <div class="register-header">
-                <i class="fas fa-user-plus"></i>
-                <h1>Inscription</h1>
-                <p>Créez votre compte pour accéder à la plateforme</p>
+                <i class='bx bxs-user-plus'></i>
+                <h1>Créer un compte</h1>
+                <p>Rejoignez la plateforme EVALUP</p>
             </div>
 
             <form id="registerForm" class="register-form">
                 <div class="form-group">
                     <label for="nom">
-                        <i class="fas fa-user"></i>
+                        <i class='bx bx-user'></i>
                         Nom
                     </label>
                     <input type="text" id="nom" name="nom" class="form-control" required>
@@ -27,7 +28,7 @@
 
                 <div class="form-group">
                     <label for="email">
-                        <i class="fas fa-envelope"></i>
+                        <i class='bx bx-envelope'></i>
                         Email
                     </label>
                     <input type="email" id="email" name="email" class="form-control" required>
@@ -35,7 +36,7 @@
 
                 <div class="form-group">
                     <label for="password">
-                        <i class="fas fa-lock"></i>
+                        <i class='bx bx-lock-alt'></i>
                         Mot de passe
                     </label>
                     <input type="password" id="password" name="password" class="form-control" required>
@@ -43,7 +44,7 @@
 
                 <div class="form-group">
                     <label for="type">
-                        <i class="fas fa-user-tag"></i>
+                        <i class='bx bx-purchase-tag-alt'></i>
                         Type
                     </label>
                     <select id="type" name="type" class="form-control" required>
@@ -55,7 +56,7 @@
 
                 <div class="form-group" id="niveau-group" style="display:none;">
                     <label for="niveau">
-                        <i class="fas fa-layer-group"></i>
+                        <i class='bx bx-layer'></i>
                         Niveau
                     </label>
                     <select id="niveau" name="niveau" class="form-control">
@@ -66,8 +67,8 @@
                     </select>
                 </div>
 
-                <button type="button" class="btn btn-primary register-btn" onclick="auth.register()">
-                    <i class="fas fa-user-plus"></i>
+                                <button type="button" class="register-btn" onclick="auth.register()">
+                    <i class='bx bx-user-plus'></i>
                     Créer mon compte
                 </button>
             </form>
