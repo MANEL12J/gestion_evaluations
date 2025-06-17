@@ -21,7 +21,7 @@ function get_evaluations_prof($prof_id) {
             e.semestre,
             e.module,
             COUNT(DISTINCT s.etudiant_id) as nombre_etudiants,
-            ROUND(AVG(s.note), 2) as moyenne_classe
+            ROUND(COALESCE(AVG(s.note), 0), 2) as moyenne_classe
         FROM evaluations e
         LEFT JOIN soumissions s ON e.id = s.evaluation_id
         WHERE e.createur_id = :prof_id

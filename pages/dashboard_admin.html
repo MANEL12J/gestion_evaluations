@@ -7,6 +7,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/admin.css">
+    <style>
+        .table td.moyenne-ok {
+            color: #198754 !important; /* Vert */
+            font-weight: bold;
+        }
+        .table td.moyenne-ko {
+            color: #dc3545 !important; /* Rouge */
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -266,12 +276,13 @@
                             
                             evaluations.forEach(eval => {
                                 const row = document.createElement('tr');
+                                const moyenne = parseFloat(eval.moyenne_classe);
                                 row.innerHTML = `
                                     <td>${eval.titre}</td>
                                     <td>${eval.module}</td>
                                     <td>${eval.semestre}</td>
                                     <td>${eval.nombre_etudiants}</td>
-                                    <td>${eval.moyenne_classe}</td>
+                                    <td class="${moyenne >= 10 ? 'moyenne-ok' : 'moyenne-ko'}">${moyenne.toFixed(2)}</td>
                                 `;
                                 tbody.appendChild(row);
                             });

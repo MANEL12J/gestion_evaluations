@@ -215,10 +215,21 @@ const utils = {
     },
 
     // Afficher une erreur
-    showError(error, defaultMessage) {
-        console.error("Erreur:", error);
-        alert(error.message || defaultMessage);
-    }
+    showError(error, message) {
+        console.error(message, error);
+        // Vérifier si la modale est disponible avant de l'utiliser
+        if (typeof modalManager !== 'undefined' && modalManager.modal) {
+            modalManager.show({
+                title: 'Erreur',
+                text: `${message}<br><small>${error.message}</small>`,
+                confirmText: 'Fermer',
+                showCancel: false
+            });
+        } else {
+            // Fallback si la modale n'est pas initialisée ou n'existe pas
+            alert(`${message}: ${error.message}`);
+        }
+    },
 };
 
 // Gestion de l'authentification
@@ -302,6 +313,103 @@ const auth = {
     }
 };
 // Gestion des évaluations côté étudiant
+// Gestionnaire de la modale personnalisée
+const modalManager = {
+    modal: null,
+    title: null,
+    text: null,
+    confirmBtn: null,
+    cancelBtn: null,
+    onConfirm: null,
+
+    init() {
+        this.modal = document.getElementById('custom-modal');
+        this.title = document.getElementById('modal-title');
+        this.text = document.getElementById('modal-text');
+        this.confirmBtn = document.getElementById('modal-confirm-btn');
+        this.cancelBtn = document.getElementById('modal-cancel-btn');
+
+        this.confirmBtn.addEventListener('click', () => this.handleConfirm());
+        this.cancelBtn.addEventListener('click', () => this.hide());
+    },
+
+    show({ title, text, confirmText = 'Confirmer', cancelText = 'Annuler', onConfirm, showCancel = true }) {
+        this.title.textContent = title;
+        this.text.innerHTML = text; // Utiliser innerHTML pour permettre les balises (ex: <br>)
+        this.confirmBtn.textContent = confirmText;
+        this.cancelBtn.textContent = cancelText;
+        this.onConfirm = onConfirm;
+
+        this.cancelBtn.style.display = showCancel ? 'inline-block' : 'none';
+        this.modal.classList.add('visible');
+    },
+
+    hide() {
+        this.modal.classList.remove('visible');
+    },
+
+    handleConfirm() {
+        if (this.onConfirm) {
+            this.onConfirm();
+        }
+        this.hide();
+    }
+};
+
+// Gestionnaire du blocage de navigation
+const navigationBlocker = {
+    isBlocked: false,
+
+    block() {
+        if (this.isBlocked) return;
+        this.isBlocked = true;
+        history.pushState(null, null, location.href);
+
+        window.addEventListener('popstate', this.handlePopState);
+        window.addEventListener('beforeunload', this.handleBeforeUnload);
+        document.addEventListener('keydown', this.handleKeyDown, true);
+    },
+
+    unblock() {
+        if (!this.isBlocked) return;
+        this.isBlocked = false;
+        window.removeEventListener('popstate', this.handlePopState);
+        window.removeEventListener('beforeunload', this.handleBeforeUnload);
+        document.removeEventListener('keydown', this.handleKeyDown, true);
+    },
+
+    handlePopState() {
+        history.pushState(null, null, location.href);
+        modalManager.show({
+            title: 'Navigation bloquée',
+            text: 'Vous devez soumettre votre évaluation avant de quitter cette page.',
+            confirmText: 'Compris',
+            showCancel: false
+        });
+    },
+
+    handleBeforeUnload(e) {
+        e.preventDefault();
+        e.returnValue = 'Les données non sauvegardées seront perdues.';
+        return e.returnValue;
+    },
+
+    handleKeyDown(e) {
+        if ((e.altKey && ['ArrowLeft', 'ArrowRight'].includes(e.key)) ||
+            (e.ctrlKey && e.key.toLowerCase() === 'w') ||
+            (e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName))) {
+            e.preventDefault();
+            modalManager.show({
+                title: 'Navigation bloquée',
+                text: "Cette action est désactivée pendant l'évaluation.",
+                confirmText: 'Compris',
+                showCancel: false
+            });
+        }
+    },
+};
+
+// Gestion des évaluations côté étudiant
 const evaluationManager = {
     timerInterval: null,
     tempsRestant: 0,
@@ -314,6 +422,7 @@ const evaluationManager = {
             this.mettreAJourInterface(evaluation);
             this.demarrerTimer(evaluation.duree_evaluation);
             this.chargerQuestions(evaluation.questions);
+            navigationBlocker.block();
         } catch (error) {
             utils.showError(error, "Erreur lors du chargement de l'évaluation");
             utils.redirect('dashboard_etudiant.html');
@@ -332,7 +441,7 @@ const evaluationManager = {
             this.tempsRestant--;
             if (this.tempsRestant <= 0) {
                 clearInterval(this.timerInterval);
-                this.soumettreEvaluation();
+                this.soumettreEvaluation(true); // Soumission automatique
             }
             this.mettreAJourAffichageTimer();
         }, 1000);
@@ -347,8 +456,8 @@ const evaluationManager = {
         const timerElement = document.getElementById('timer-display');
         if (timerElement) {
             timerElement.textContent = affichage;
-            if (this.tempsRestant < 300) {
-                document.querySelector('.timer')?.classList.add('timer-warning');
+            if (this.tempsRestant < 300 && !timerElement.parentElement.classList.contains('timer-warning')) {
+                timerElement.parentElement.classList.add('timer-warning');
             }
         }
     },
@@ -366,7 +475,6 @@ const evaluationManager = {
         questions.forEach((question, index) => {
             const questionElement = questionTemplate.content.cloneNode(true);
             const questionBlock = questionElement.querySelector('.question-block');
-            
             if (!questionBlock) return;
 
             questionBlock.setAttribute('data-question-id', question.id);
@@ -386,12 +494,11 @@ const evaluationManager = {
             const reponseElement = template.content.cloneNode(true);
             const checkbox = reponseElement.querySelector('.reponse-checkbox');
             const label = reponseElement.querySelector('.reponse-label');
-
             if (!checkbox || !label) return;
 
             checkbox.id = `q${questionIndex}_r${reponseIndex}`;
             checkbox.name = `question_${questionIndex}`;
-            checkbox.value = reponse.id; // Utiliser l'ID de la réponse au lieu de l'index
+            checkbox.value = reponse.id;
 
             label.htmlFor = checkbox.id;
             label.textContent = reponse.texte;
@@ -400,10 +507,11 @@ const evaluationManager = {
         });
     },
 
-
-
-    async soumettreEvaluation() {
+    async soumettreEvaluation(isAutoSubmit = false) {
         try {
+            navigationBlocker.unblock();
+            clearInterval(this.timerInterval);
+
             const reponses = [];
             document.querySelectorAll('.question-block').forEach(questionBlock => {
                 const questionId = questionBlock.getAttribute('data-question-id');
@@ -417,31 +525,36 @@ const evaluationManager = {
                 }
             });
 
-            console.log('Réponses collectées:', reponses);
-
-            if (!reponses.length) {
-                throw new Error('Aucune réponse n\'a été sélectionnée');
+            if (!reponses.length && !isAutoSubmit) {
+                 modalManager.show({
+                    title: 'Aucune réponse',
+                    text: 'Vous devez sélectionner au moins une réponse avant de soumettre.',
+                    confirmText: 'Compris',
+                    showCancel: false
+                });
+                navigationBlocker.block(); // Re-bloquer
+                return;
             }
 
             const data = await utils.apiRequest('soumettre_evaluation.php', 'POST', {
-                evaluation_id: getEvaluationIdFromUrl(),
+                evaluation_id: this.getEvaluationIdFromUrl(),
                 reponses: reponses,
                 temps_restant: this.tempsRestant
             });
 
-            console.log('Réponse du serveur:', data);
+            modalManager.show({
+                title: isAutoSubmit ? 'Temps écoulé !' : 'Évaluation soumise !',
+                text: `Votre évaluation a été soumise avec succès.<br>Votre note est de : <strong>${data.note}/20</strong>`,
+                confirmText: 'Retour au tableau de bord',
+                showCancel: false,
+                onConfirm: () => {
+                    utils.redirect('dashboard_etudiant.html');
+                }
+            });
 
-            console.log('Soumission réussie, désactivation des protections de navigation');
-            // Marquer l'évaluation comme soumise
-            sessionStorage.setItem('evaluationSoumise', 'true');
-            
-            // Désactiver le blocage de navigation
-            window.onbeforeunload = null;
-            alert(`Évaluation soumise avec succès! Note: ${data.note}/20`);
-            window.location.href = 'dashboard_etudiant.html';
         } catch (error) {
-            console.error('Erreur:', error);
             utils.showError(error, "Erreur lors de la soumission de l'évaluation");
+            navigationBlocker.block(); // Re-bloquer en cas d'erreur
         }
     },
 
@@ -454,24 +567,41 @@ const evaluationManager = {
     init() {
         if (!window.location.pathname.includes('passer_evaluation.html')) return;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        const setupPage = () => {
             try {
+                modalManager.init();
                 const evaluationId = this.getEvaluationIdFromUrl();
                 this.chargerEvaluation(evaluationId);
 
                 document.getElementById('evaluation-form')?.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    if (confirm('Êtes-vous sûr de vouloir soumettre l\'évaluation ?')) {
-                        this.soumettreEvaluation();
-                    }
+                    modalManager.show({
+                        title: 'Confirmer la soumission',
+                        text: 'Êtes-vous sûr de vouloir soumettre votre évaluation ?<br>Cette action est définitive.',
+                        confirmText: 'Soumettre',
+                        onConfirm: () => this.soumettreEvaluation()
+                    });
                 });
             } catch (error) {
                 utils.showError(error, "Erreur lors de l'initialisation");
                 utils.redirect('dashboard_etudiant.html');
             }
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupPage);
+        } else {
+            setupPage();
+        }
     }
 };
+
+evaluationManager.init();
+// Fonction utilitaire pour récupérer l'ID de l'évaluation depuis l'URL
+function getEvaluationIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+}
 
 
 // Appel automatique au chargement de la page
@@ -697,15 +827,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     afficherEvaluations();
 
-    evaluationsContainer.addEventListener('click', (event) => {
-        if (event.target.classList.contains('delete-evaluation')) {
-            const evalId = event.target.getAttribute('data-id');
-            supprimerEvaluation(evalId);
-        }
-    });
+    // evaluationsContainer.addEventListener('click', (event) => {
+    //     const deleteButton = event.target.closest('.delete-evaluation');
+    //     if (deleteButton) {
+    //         const evalId = deleteButton.getAttribute('data-id');
+    //         supprimerEvaluation(evalId);
+    //     }
+    // });
 });
 }
-
 
 async function afficherEvaluations() {
     try {
@@ -738,7 +868,7 @@ async function afficherEvaluations() {
                         <p><strong>Heure de l'évaluation:</strong> ${eval.heure_evaluation.substring(0, 5)}</p>
                         <p><strong>Durée de l'évaluation:</strong> ${dureeFormatee}</p>
                         <div class="evaluation-actions">
-                            <button class="btn btn-danger delete-evaluation" data-id="${eval.id}">
+                            <button class="btn btn-danger" onclick="supprimerEvaluation(${eval.id})">
                                 <i class='bx bx-trash'></i> Supprimer
                             </button>
                         </div>
@@ -826,91 +956,7 @@ function chargerQuestions(questions) {
     });
 }
 
-// Fonction utilitaire pour récupérer l'ID de l'évaluation depuis l'URL
-function getEvaluationIdFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('id');
-}
 
-// Fonction pour empêcher la navigation sur la page d'évaluation
-function bloquerNavigation() {
-    console.log('Blocage de la navigation activé');
-
-    // Empêcher TOUTE navigation
-    window.addEventListener('beforeunload', function(e) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-    });
-
-    // Empêcher le retour arrière
-    window.addEventListener('popstate', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        history.pushState(null, null, window.location.href);
-        alert('Vous devez soumettre votre évaluation avant de quitter.');
-    });
-
-    // Empêcher la navigation par URL
-    window.addEventListener('hashchange', function(e) {
-        e.preventDefault();
-        alert('Vous devez soumettre votre évaluation avant de quitter.');
-    });
-
-    // Empêcher les raccourcis clavier
-    document.addEventListener('keydown', function(e) {
-        if ((e.altKey && ['ArrowLeft', 'ArrowRight'].includes(e.key)) ||
-            (e.ctrlKey && e.key.toLowerCase() === 'w') ||
-            (e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName))) {
-            e.preventDefault();
-            alert('Vous devez soumettre votre évaluation avant de quitter.');
-        }
-    });
-
-    // Forcer l'état de l'historique
-    history.pushState(null, null, window.location.href);
-    history.pushState(null, null, window.location.href);
-    history.pushState(null, null, window.location.href);
-}
-
-// Initialisation de la page d'évaluation
-if (window.location.pathname.includes('passer_evaluation.html')) {
-    // Bloquer IMMÉDIATEMENT toute navigation
-    window.addEventListener('beforeunload', function(e) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-    });
-
-    // Empêcher le retour arrière immédiatement
-    history.pushState(null, null, window.location.href);
-    window.addEventListener('popstate', function(e) {
-        e.preventDefault();
-        history.pushState(null, null, window.location.href);
-        alert('Vous devez soumettre votre évaluation avant de quitter.');
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Activer tous les autres blocages une fois la page chargée
-        bloquerNavigation();
-        const evaluationId = getEvaluationIdFromUrl();
-        if (evaluationId) {
-            evaluationManager.chargerEvaluation(evaluationId);
-        } else {
-            // Marquer l'évaluation comme soumise et rediriger
-            window.evaluationSoumise = true;
-            window.location.href = 'dashboard_etudiant.html';
-        }
-
-        // Gestionnaire de soumission du formulaire
-        document.getElementById('evaluation-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (confirm("\u00cates-vous s\u00fbr de vouloir soumettre l'évaluation ?")) {
-                evaluationManager.soumettreEvaluation();
-            }
-        });
-    });
-}
 
 // Fonction pour voir les évaluations de l'enseignant
 async function voirEvaluationsEnseignant() {
@@ -1284,6 +1330,18 @@ async function voirEvaluationsAVenir(queryParams = '') {
 
                 grid.innerHTML = evaluations.map(eval => {
                     const dateEvaluation = new Date(eval.date_evaluation + 'T' + eval.heure_evaluation);
+                    const dureeMinutes = parseInt(eval.duree_evaluation, 10);
+                    const dateFinEvaluation = new Date(dateEvaluation.getTime() + dureeMinutes * 60000);
+                    const now = new Date();
+
+                    const isAvailable = now >= dateEvaluation && now <= dateFinEvaluation;
+
+                    const actionHtml = isAvailable
+                        ? `<a href="passer_evaluation.html?id=${eval.id}" class="btn btn-primary">
+                               <i class='bx bx-play'></i> Passer l'évaluation
+                           </a>`
+                        : `<div class="text-muted">Non disponible</div>`;
+
                     return `
                     <div class="evaluation-item">
                         <div class="evaluation-titre">${eval.titre}</div>
@@ -1310,9 +1368,7 @@ async function voirEvaluationsAVenir(queryParams = '') {
                             </div>
                         </div>
                         <div class="evaluation-actions">
-                            <a href="passer_evaluation.html?id=${eval.id}" class="btn btn-primary">
-                                <i class='bx bx-play'></i> Passer l'évaluation
-                            </a>
+                            ${actionHtml}
                         </div>
                     </div>`;
                 }).join('');

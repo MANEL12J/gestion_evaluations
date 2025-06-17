@@ -6,34 +6,57 @@
     <title>Passer l'évaluation</title>
     <link rel="stylesheet" href="../assets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script>
-        // Bloquer la navigation immédiatement
-        (function() {
-            // Empêcher le retour arrière
-            history.pushState(null, null, location.href);
-            window.addEventListener('popstate', function() {
-                history.pushState(null, null, location.href);
-                alert('Vous devez soumettre votre évaluation avant de quitter.');
-            });
-
-            // Bloquer la fermeture de la page
-            window.addEventListener('beforeunload', function(e) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            });
-
-            // Bloquer les raccourcis clavier
-            document.addEventListener('keydown', function(e) {
-                if ((e.altKey && ['ArrowLeft', 'ArrowRight'].includes(e.key)) ||
-                    (e.ctrlKey && e.key.toLowerCase() === 'w') ||
-                    (e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName))) {
-                    e.preventDefault();
-                    alert('Vous devez soumettre votre évaluation avant de quitter.');
-                }
-            }, true);
-        })();
-    </script>
+        <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.5em;
+        }
+        .modal-content p {
+            margin-bottom: 25px;
+            color: #555;
+            font-size: 1.1em;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+    </style>
 </head>
 <body class="evaluation-page">
     <div class="timer-container">
@@ -83,6 +106,18 @@
             <label class="reponse-label"></label>
         </div>
     </template>
+
+    <!-- Modal de confirmation -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title">Titre de la modale</h3>
+            <p id="modal-text">Message de la modale.</p>
+            <div id="modal-buttons" class="modal-buttons">
+                <button id="modal-confirm-btn" class="btn btn-primary">Confirmer</button>
+                <button id="modal-cancel-btn" class="btn btn-secondary">Annuler</button>
+            </div>
+        </div>
+    </div>
 
     <script src="../assets/scripts.js"></script>
 </body>
