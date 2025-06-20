@@ -16,6 +16,104 @@
             color: #dc3545 !important; /* Rouge */
             font-weight: bold;
         }
+
+        /* --- Nouveaux Styles --- */
+        .btn-details {
+            transition: all 0.3s ease;
+        }
+
+        .details-row td {
+            padding: 0 !important;
+            background-color: transparent;
+            border: none;
+        }
+
+        .details-container {
+            margin: 0.5rem 1rem 1rem 1rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.06);
+            animation: fadeInDetails 0.4s ease-in-out;
+        }
+
+        .details-container h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .details-container .table {
+            background-color: #fff;
+            border-radius: 5px;
+        }
+
+        @keyframes fadeInDetails {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Style Général du Tableau de Bord --- */
+        body {
+            background-color: #f4f7f9; /* Fond gris clair */
+        }
+
+        .stat-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            border: none;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card-body {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+        }
+        .stat-icon {
+            font-size: 2.8rem;
+            margin-right: 20px;
+            line-height: 1;
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #343a40;
+        }
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+
+        .dashboard-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden; /* Pour les coins arrondis */
+        }
+        .dashboard-card .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .table thead {
+            background-color: #f8f9fa;
+        }
+        .table th {
+            font-weight: 600;
+            color: #495057;
+            border-bottom-width: 1px;
+        }
     </style>
 </head>
 <body>
@@ -48,23 +146,29 @@
         </div>
 
         <!-- Statistiques -->
-        <div class="stats-container">
-            <div class="row g-0">
-                <div class="col-6">
-                    <div class="stat-item">
-                        <i class='bx bx-user-circle' style="font-size: 1.5rem; color: var(--secondary-color);"></i>
-                        <div class="stat-content">
-                            <div class="stat-number" id="nombre-etudiants">...</div>
-                            <div class="stat-label">Étudiants</div>
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="stat-card h-100">
+                    <div class="stat-card-body">
+                        <div class="stat-icon text-primary">
+                            <i class='bx bx-user-group'></i>
+                        </div>
+                        <div>
+                            <h5 class="stat-number" id="nombre-etudiants">...</h5>
+                            <p class="stat-label mb-0">Étudiants Inscrits</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="stat-item">
-                        <i class='bx bx-chalkboard' style="font-size: 1.5rem; color: var(--secondary-color);"></i>
-                        <div class="stat-content">
-                            <div class="stat-number" id="nombre-enseignants">...</div>
-                            <div class="stat-label">Enseignants</div>
+            </div>
+            <div class="col-md-6">
+                <div class="stat-card h-100">
+                    <div class="stat-card-body">
+                        <div class="stat-icon text-info">
+                            <i class='bx bxs-user-detail'></i>
+                        </div>
+                        <div>
+                            <h5 class="stat-number" id="nombre-enseignants">...</h5>
+                            <p class="stat-label mb-0">Enseignants </p>
                         </div>
                     </div>
                 </div>
@@ -114,11 +218,11 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Évaluation</th>
                                             <th>Module</th>
                                             <th>Semestre</th>
                                             <th>Étudiants</th>
                                             <th>Moyenne/20</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="liste-evaluations-l1">
@@ -135,11 +239,11 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Évaluation</th>
                                             <th>Module</th>
                                             <th>Semestre</th>
                                             <th>Étudiants</th>
                                             <th>Moyenne/20</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="liste-evaluations-l2">
@@ -156,11 +260,11 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Évaluation</th>
                                             <th>Module</th>
                                             <th>Semestre</th>
                                             <th>Étudiants</th>
                                             <th>Moyenne/20</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="liste-evaluations-l3">
@@ -276,13 +380,21 @@
                             
                             evaluations.forEach(eval => {
                                 const row = document.createElement('tr');
-                                const moyenne = parseFloat(eval.moyenne_classe);
+                                const moyenne = parseFloat(eval.moyenne_module);
                                 row.innerHTML = `
-                                    <td>${eval.titre}</td>
                                     <td>${eval.module}</td>
                                     <td>${eval.semestre}</td>
                                     <td>${eval.nombre_etudiants}</td>
                                     <td class="${moyenne >= 10 ? 'moyenne-ok' : 'moyenne-ko'}">${moyenne.toFixed(2)}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info btn-details"
+                                                data-prof-id="${profId}"
+                                                data-module="${eval.module}"
+                                                data-niveau="${eval.niveau}"
+                                                data-semestre="${eval.semestre}">
+                                            <i class='bx bx-show-alt me-1'></i>Détails
+                                        </button>
+                                    </td>
                                 `;
                                 tbody.appendChild(row);
                             });
@@ -342,6 +454,56 @@
                 console.error('Erreur lors de la vérification:', error);
                 window.location.href = 'login.html';
             });
+
+        // Gestionnaire d'événements pour les boutons "Détails"
+        document.getElementById('all-sections').addEventListener('click', function(e) {
+            const button = e.target.closest('.btn-details');
+            if (button) {
+                const profId = button.dataset.profId;
+                const module = button.dataset.module;
+                const niveau = button.dataset.niveau;
+                const semestre = button.dataset.semestre;
+                const parentRow = button.closest('tr');
+
+                // Vérifier si les détails sont déjà affichés
+                const detailsRow = parentRow.nextElementSibling;
+                if (detailsRow && detailsRow.classList.contains('details-row')) {
+                    detailsRow.remove(); // Cacher les détails si déjà visibles
+                    button.innerHTML = "<i class='bx bx-show-alt me-1'></i>Détails";
+                    button.classList.replace('btn-secondary', 'btn-info');
+                    return;
+                }
+
+                // Charger et afficher les détails
+                fetch(`../api/get_module_details.php?prof_id=${profId}&module=${encodeURIComponent(module)}&niveau=${niveau}&semestre=${semestre}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.evaluations.length > 0) {
+                            const newRow = document.createElement('tr');
+                            newRow.className = 'details-row';
+                            let detailsHtml = '<td colspan="5">';
+                            detailsHtml += '<div class="details-container">';
+                            detailsHtml += '<h5>Détails pour le module ' + module + '</h5>';
+                            detailsHtml += '<table class="table table-sm table-bordered table-striped">';
+                            detailsHtml += '<thead class="table-light"><tr><th>Évaluation</th><th>Étudiants</th><th>Moyenne</th></tr></thead>';
+                            detailsHtml += '<tbody>';
+                            data.evaluations.forEach(det => {
+                                detailsHtml += `<tr><td>${det.titre}</td><td>${det.nombre_etudiants}</td><td>${parseFloat(det.moyenne_classe).toFixed(2)}</td></tr>`;
+                            });
+                            detailsHtml += '</tbody></table></div></td>';
+                            newRow.innerHTML = detailsHtml;
+                            parentRow.after(newRow);
+
+                            // Mettre à jour le bouton
+                            button.innerHTML = "<i class='bx bx-hide me-1'></i>Cacher";
+                            button.classList.replace('btn-info', 'btn-secondary');
+                        } else {
+                            alert('Aucun détail trouvé pour ce module.');
+                        }
+                    })
+                    .catch(error => console.error('Erreur:', error));
+            }
+        });
     </script>
 </body>
 </html>

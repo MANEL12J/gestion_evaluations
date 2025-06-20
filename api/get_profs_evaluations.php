@@ -15,33 +15,33 @@ function get_evaluations_prof($prof_id) {
     global $pdo;
     $query = "
         SELECT 
-            e.id,
-            e.titre,
+            e.module,
             e.niveau,
             e.semestre,
-            e.module,
             COUNT(DISTINCT s.etudiant_id) as nombre_etudiants,
-            ROUND(COALESCE(AVG(s.note), 0), 2) as moyenne_classe
+            ROUND(AVG(s.note), 2) as moyenne_module
         FROM evaluations e
-        LEFT JOIN soumissions s ON e.id = s.evaluation_id
+        JOIN soumissions s ON e.id = s.evaluation_id
         WHERE e.createur_id = :prof_id
-        GROUP BY e.id
-        ORDER BY e.niveau, e.semestre, e.date_evaluation DESC
+        GROUP BY e.niveau, e.semestre, e.module
+        ORDER BY e.niveau, e.semestre
     ";
     
     $stmt = $pdo->prepare($query);
     $stmt->execute(['prof_id' => $prof_id]);
-    $evaluations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $modules_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Grouper les évaluations par niveau
+    // Grouper les données par niveau
     $grouped = [
         'L1' => [],
         'L2' => [],
         'L3' => []
     ];
     
-    foreach ($evaluations as $eval) {
-        $grouped[$eval['niveau']][] = $eval;
+    foreach ($modules_data as $module) {
+        if (isset($grouped[$module['niveau']])) {
+            $grouped[$module['niveau']][] = $module;
+        }
     }
     
     return $grouped;
