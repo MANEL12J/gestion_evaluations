@@ -55,24 +55,26 @@ try {
     $stmt->execute([$titre, $date_evaluation, $heure_evaluation, $duree_evaluation, $niveau, $semestre, $module, $createur_id]);
     $evaluation_id = $pdo->lastInsertId(); // Récupère l'ID de l'évaluation insérée
 
+    // Préparer les requêtes une seule fois pour l'optimisation
+    $stmt_question = $pdo->prepare("INSERT INTO questions (id_evaluation, question) VALUES (?, ?)");
+    $stmt_reponse = $pdo->prepare("INSERT INTO reponses (id_question, texte, est_correct) VALUES (?, ?, ?)");
+
     // Insertion des questions + réponses
     foreach ($questions as $q) {
         $question_text = $q["question"];
-        $stmt = $pdo->prepare("INSERT INTO questions (id_evaluation, question) VALUES (?, ?)");
-        $stmt->execute([$evaluation_id, $question_text]);
-        $question_id = $pdo->lastInsertId(); // Récupère l'ID de la question insérée
+        $stmt_question->execute([$evaluation_id, $question_text]);
+        $question_id = $pdo->lastInsertId();
 
         foreach ($q["reponses"] as $r) {
             $texte = $r["texte"];
             $correct = $r["correct"];
-            $stmt = $pdo->prepare("INSERT INTO reponses (id_question, texte, est_correct) VALUES (?, ?, ?)");
-            $stmt->execute([$question_id, $texte, $correct]);
+            $stmt_reponse->execute([$question_id, $texte, $correct]);
         }
     }
 
     $pdo->commit(); // Valide la transaction
 
-    // Appel API pour notification immédiate
+    // Appel API non-bloquant pour la notification
     $notificationUrl = $_SERVER['REQUEST_SCHEME']. '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']) . '/send_evaluation_notification.php';
     $payload = [
         'niveau' => $niveau,
@@ -80,12 +82,16 @@ try {
         'date_evaluation' => $date_evaluation,
         'heure_evaluation' => $heure_evaluation
     ];
+    
     $ch = curl_init($notificationUrl);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    $response = curl_exec($ch);
+    // Rend l'appel non-bloquant en définissant un timeout très court
+    curl_setopt($ch, CURLOPT_TIMEOUT_MS, 100); // Timeout de 100 millisecondes
+    curl_setopt($ch, CURLOPT_NOSIGNAL, 1); // Recommandé pour les timeouts en ms
+    curl_exec($ch);
     curl_close($ch);
 
     echo json_encode(["success" => true]);
